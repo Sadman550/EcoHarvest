@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EcoHarvest</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .sidebar {
+      width: 220px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      background-color: #e9ecef;
+      padding: 1rem;
+      border-right: 1px solid #dee2e6;
+    }
+
+    .main-content {
+      margin-left: 220px;
+    }
+
+    .main-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+      padding: 1.25rem 0;
+      text-align: center;
+    }
+
+    .footer {
+      border-top: 1px solid #dee2e6;
+      padding: 1rem 0;
+      text-align: center;
+      font-size: 0.9rem;
+      background-color: #e9ecef;
+    }
+
+    /* Sidebar Hover Animation */
+    .nav-link {
+      transition: all 0.3s ease;
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    .nav-link:hover {
+      background-color: #0d6efd;
+      color: white !important;
+      transform: translateX(5px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="d-flex align-items-center mb-3">
+    <i class="bi bi-bootstrap-fill fs-4 me-2 text-primary"></i>
+    <strong>Sidebar</strong>
+  </div>
+  <hr>
+  <ul class="nav flex-column">
+    <li class="nav-item mb-2">
+      <a href="#" class="nav-link active bg-primary text-white d-flex align-items-center">
+        <i class="bi bi-house-door me-2"></i> Graded Products
+      </a>
+    </li>
+    <li class="nav-item mb-2">
+      <a href="packaging_tracking.html" class="nav-link text-dark d-flex align-items-center">
+        <i class="bi bi-leaf me-2"></i> Packaging Tracking
+      </a>
+    </li>
+    <li class="nav-item mb-2">
+      <a href="qualityreport.html" class="nav-link text-dark d-flex align-items-center">
+        <i class="bi bi-clipboard-check me-2"></i> Quality Report
+      </a>
+    </li>
+  </ul>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+
+  <!-- Header -->
+  <header class="main-header">
+    <h4 class="mb-0 fw-bold">Graded Produced Track</h4>
+  </header>
+
+  <!-- Body -->
+  <div class="container-fluid p-4">
+    <div class="card shadow mb-4">
+      <div class="card-header fw-bold">📝 Add Product Info</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Grade:</label>
+            <input type="text" id="grade" class="form-control" placeholder="e.g. Grade A">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Product Name:</label>
+            <input type="text" id="product" class="form-control" placeholder="e.g. Mango">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Weight:</label>
+            <input type="text" id="Weight" class="form-control" placeholder="e.g. 2 k.g">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Tracking Info:</label>
+            <input type="text" id="track" class="form-control" placeholder="e.g. Farm ➝ Market">
+          </div>
+          <div class="col-md-2 d-grid">
+            <label class="form-label">&nbsp;</label>
+            <button onclick="addRow()" class="btn btn-success">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card shadow">
+      <div class="card-header fw-bold">📋 Product Tracking Table</div>
+      <div class="card-body">
+        <table class="table table-bordered text-center" id="dataTable">
+          <thead class="table-light">
+            <tr>
+              <th>No</th>
+              <th>Grade</th>
+              <th>Product</th>
+              <th>Track</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Dynamic rows here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer mt-auto">
+    <div class="text-muted">
+      &copy; 2025 EcoHarvest. All rights reserved.
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  let count = 1;
+
+  function addRow() {
+    const grade = document.getElementById('grade').value.trim();
+    const product = document.getElementById('product').value.trim();
+    const track = document.getElementById('track').value.trim();
+
+    if (!grade || !product || !track) {
+      alert("Please fill all fields!");
+      return;
+    }
+
+    const table = document.getElementById("tableBody");
+    const row = table.insertRow();
+    row.innerHTML = `
+      <td>${count++}</td>
+      <td>${grade}</td>
+      <td>${product}</td>
+      <td>${track}</td>
+      <td>
+        <button class="btn btn-warning btn-sm me-1" onclick="editRow(this)">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteRow(this)">Delete</button>
+      </td>
+    `;
+
+    document.getElementById('grade').value = '';
+    document.getElementById('product').value = '';
+    document.getElementById('track').value = '';
+  }
+
+  function deleteRow(btn) {
+    const row = btn.closest("tr");
+    row.remove();
+    const rows = document.querySelectorAll("#tableBody tr");
+    count = 1;
+    rows.forEach((r, i) => r.cells[0].innerText = count++);
+  }
+
+  function editRow(btn) {
+    const row = btn.closest("tr");
+    const grade = prompt("Edit Grade:", row.cells[1].innerText);
+    const product = prompt("Edit Product:", row.cells[2].innerText);
+    const track = prompt("Edit Track Info:", row.cells[3].innerText);
+
+    if (grade && product && track) {
+      row.cells[1].innerText = grade;
+      row.cells[2].innerText = product;
+      row.cells[3].innerText = track;
+    }
+  }
+</script>
+
+</body>
+</html>
