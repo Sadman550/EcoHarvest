@@ -8,7 +8,7 @@
   <style>
     .sidebar {
       min-height: 100vh;
-      background-color: #f8f9fa;
+      background-color: #e9ecef;
       padding-top: 1rem;
     }
     .sidebar a:hover {
@@ -24,7 +24,7 @@
       padding: 1rem 0;
       text-align: center;
       font-size: 0.9rem;
-      background-color: #f8f9fa;
+      background-color: #e9ecef;
     }
     .footer a {
       margin: 0 10px;
@@ -39,7 +39,7 @@
 <body>
 
 <!-- Header -->
-<header class="bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+<header class="p-3 d-flex justify-content-between align-items-center" style="background-color: #f1f1f1;">
   <div class="d-flex align-items-center">
     <i class="bi bi-bootstrap-fill fs-3 me-2 text-primary"></i>
     <h4 class="mb-0">EcoHarvest</h4>
@@ -123,7 +123,7 @@
           <div class="card shadow">
             <div class="card-header fw-bold">📋 Packaging Records</div>
             <div class="card-body">
-              <table class="table table-success table-striped">
+              <table class="table table-striped">
                 <thead>
                   <tr>
                     <th>ID</th>
@@ -132,8 +132,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td>1</td><td>EcoBox S</td><td>2.5</td></tr>
-                  <tr><td>2</td><td>EcoBag XL</td><td>1.8</td></tr>
+                  <tr class="table-primary"><td>1</td><td>EcoBox S</td><td>2.5</td></tr>
+                  <tr class="table-success"><td>2</td><td>EcoBag XL</td><td>1.8</td></tr>
+                  <tr class="table-warning"><td>3</td><td>EcoCrate M</td><td>4.1</td></tr>
+                  <tr class="table-info"><td>4</td><td>EcoWrap L</td><td>0.9</td></tr>
                 </tbody>
               </table>
             </div>
