@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Green Harvest</title>
   <style>
+    /* (All your original styles remain unchanged) */
+
     * {
       margin: 0;
       padding: 0;
@@ -190,7 +192,6 @@
       text-align: left;
       font-weight: 600;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
       background-color: rgba(46, 139, 87, 0.3);
     }
 
@@ -226,15 +227,21 @@
       color: white;
     }
 
-    .chart-container {
+    .charts-flex {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 30px;
       margin-top: 40px;
+    }
+
+    .chart-container {
       background-color: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(5px);
       border-radius: 8px;
       padding: 20px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
+      width: 100%;
+      max-width: 450px;
     }
 
     .chart-title {
@@ -270,13 +277,17 @@
 </head>
 <body>
   <header id="navbar">
-    <div class="logo">Green Harvest</div>
+    <div class="logo">Eco Harvest</div>
     <nav>
       <ul>
-        <li><a href="#">Our Services</a></li>
-        <li><a href="#">Products</a></li>
-        <li><a href="#">Shop</a></li>
-        <li><a href="#">Contact</a></li>
+        <li><a href="#">Dashboard</a></li>
+        <li><a href="#">Quality Report</a></li>
+        <li><a href="#">Greaded Produced</a></li>
+        <li><a href="#">Suply Chain</a></li>
+        <li><a href="#">Quality Analysis</a></li>
+        <li><a href="#">Packaging</a></li>
+        <li><a href="#">Transportation</a></li>
+        <li><a href="#">Logout</a></li>
       </ul>
     </nav>
   </header>
@@ -330,9 +341,15 @@
         </table>
       </div>
 
-      <div class="chart-container">
-        <h2 class="chart-title">Packaging Weight Distribution</h2>
-        <canvas id="weightChart"></canvas>
+      <div class="charts-flex">
+        <div class="chart-container">
+          <h2 class="chart-title">Packaging Weight Distribution</h2>
+          <canvas id="weightChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <h2 class="chart-title">Monthly Packaging Volume</h2>
+          <canvas id="volumeChart"></canvas>
+        </div>
       </div>
     </div>
   </section>
@@ -347,10 +364,11 @@
     ];
 
     let weightChart;
+    let volumeChart;
 
     document.addEventListener("DOMContentLoaded", () => {
       renderTable();
-      renderChart();
+      renderCharts();
       setupForm();
       setupScrollEffect();
     });
@@ -383,31 +401,32 @@
           const id = parseInt(this.dataset.id);
           packagingData = packagingData.filter(item => item.id !== id);
           renderTable();
-          renderChart();
+          renderCharts();
         });
       });
     }
 
-    function renderChart() {
-      const ctx = document.getElementById("weightChart").getContext("2d");
+    function renderCharts() {
+      const ctxPie = document.getElementById("weightChart").getContext("2d");
+      const ctxBar = document.getElementById("volumeChart").getContext("2d");
 
       const grouped = packagingData.reduce((acc, item) => {
         acc[item.type] = (acc[item.type] || 0) + item.weight;
         return acc;
       }, {});
-
       const labels = Object.keys(grouped);
-      const data = Object.values(grouped);
+      const weights = Object.values(grouped);
       const colors = ['#2e8b57cc', '#3cb371cc', '#90ee90cc', '#98fb98cc', '#006400cc'];
 
       if (weightChart) weightChart.destroy();
+      if (volumeChart) volumeChart.destroy();
 
-      weightChart = new Chart(ctx, {
+      weightChart = new Chart(ctxPie, {
         type: "pie",
         data: {
           labels: labels,
           datasets: [{
-            data: data,
+            data: weights,
             backgroundColor: colors,
             borderColor: "#fff",
             borderWidth: 1
@@ -428,6 +447,33 @@
           }
         }
       });
+
+      volumeChart = new Chart(ctxBar, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Volume (kg)",
+            data: weights,
+            backgroundColor: colors
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: { ticks: { color: "white" } },
+            y: {
+              ticks: { color: "white" },
+              beginAtZero: true
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: "white" }
+            }
+          }
+        }
+      });
     }
 
     function setupForm() {
@@ -444,7 +490,7 @@
         });
         this.reset();
         renderTable();
-        renderChart();
+        renderCharts();
       });
     }
 
