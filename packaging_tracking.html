@@ -1,224 +1,459 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>EcoHarvest</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Green Harvest</title>
   <style>
-    body {
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
     }
-    .footer {
-      border-top: 1px solid #dee2e6;
-      padding: 1rem 0;
-      text-align: center;
-      font-size: 0.9rem;
-      background-color: #e9ecef;
+
+    body {
+      color: #333;
+      background-color: #f0f4f1;
     }
-    .footer a {
-      margin: 0 10px;
-      color: #6c757d;
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 50px;
+      background-color: transparent;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 100;
+      transition: all 0.3s ease;
+    }
+
+    header.scrolled {
+      background-color: rgba(46, 139, 87, 0.9);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    header.scrolled .logo,
+    header.scrolled nav ul li a {
+      color: white;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+    }
+
+    nav ul li {
+      margin-left: 30px;
+    }
+
+    nav ul li a {
       text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 5px 0;
+      position: relative;
     }
-    .footer a:hover {
-      color: #0d6efd;
+
+    nav ul li a:hover {
+      color: #d4f7dc;
     }
-    th, td {
-      vertical-align: middle !important;
+
+    nav ul li a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: white;
+      transition: width 0.3s ease;
     }
-    canvas {
-      width: 100% !important;
+
+    nav ul li a:hover::after {
+      width: 100%;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 200px 20px 100px;
+      background-image: url('image/backgraund.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: white;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 0;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .transparent-form {
+      background-color: transparent;
+      padding: 30px;
+      margin-bottom: 40px;
+    }
+
+    .form-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 25px;
+      text-align: center;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+      color: white;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 20px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .submit-btn {
+      background-color: rgba(46, 139, 87, 0.9);
+      color: white;
+      padding: 10px 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto;
+      margin-top: 10px;
+    }
+
+    .transparent-table-container {
+      margin-top: 30px;
+      overflow-x: auto;
+    }
+
+    .transparent-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background-color: transparent;
+    }
+
+    .transparent-table th {
+      color: white;
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+      background-color: rgba(46, 139, 87, 0.3);
+    }
+
+    .transparent-table td {
+      padding: 12px 15px;
+      color: white;
+      text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .edit-btn, .delete-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .edit-btn {
+      background-color: rgba(255, 193, 7, 0.7);
+      color: #212529;
+    }
+
+    .delete-btn {
+      background-color: rgba(220, 53, 69, 0.7);
+      color: white;
+    }
+
+    .chart-container {
+      margin-top: 40px;
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .chart-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 15px;
+      text-align: center;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        padding: 15px;
+      }
+
+      nav ul {
+        margin-top: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      nav ul li {
+        margin: 5px 15px;
+      }
+
+      .form-row {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
+  <header id="navbar">
+    <div class="logo">Green Harvest</div>
+    <nav>
+      <ul>
+        <li><a href="#">Our Services</a></li>
+        <li><a href="#">Products</a></li>
+        <li><a href="#">Shop</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
 
-<!-- New Top Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm px-4">
-  <a class="navbar-brand fw-bold" href="#">EcoHarvest</a>
-  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-    <div class="navbar-nav ms-auto">
-      <a class="nav-item nav-link" href="Graded_Produced_Track.html">Graded Products</a>
-      <a class="nav-item nav-link active" href="#">Packaging Tracking</a>
-      <a class="nav-item nav-link" href="qualityreport.html">Quality Report</a>
+  <section class="hero">
+    <div class="hero-content">
+      <form class="transparent-form" id="packagingForm">
+        <h2 class="form-title">Add Packaging Info</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="packaging-type">Packaging Type</label>
+            <input type="text" id="packaging-type" required>
+          </div>
+          <div class="form-group">
+            <label for="weight">Weight (kg)</label>
+            <input type="number" id="weight" step="0.01" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="packaging-date">Packaging Date</label>
+            <input type="date" id="packaging-date" required>
+          </div>
+          <div class="form-group">
+            <label for="batch-id">Batch ID</label>
+            <input type="text" id="batch-id" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="transport-id">Transport ID</label>
+          <input type="text" id="transport-id" required>
+        </div>
+        <button type="submit" class="submit-btn">Add Packaging Info</button>
+      </form>
+
+      <div class="transparent-table-container">
+        <h2 class="form-title">Packaging Records</h2>
+        <table class="transparent-table" id="packagingTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Weight</th>
+              <th>Date</th>
+              <th>Batch ID</th>
+              <th>Transport ID</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="chart-container">
+        <h2 class="chart-title">Packaging Weight Distribution</h2>
+        <canvas id="weightChart"></canvas>
+      </div>
     </div>
-  </div>
-</nav>
+  </section>
 
-<!-- Main Content -->
-<div class="container-fluid p-4">
-  <div class="row g-4">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    let packagingData = [
+      { id: 1, type: "Eco Box", weight: 2.5, date: "2025-04-15", batchId: "BATCH001", transportId: "TRANS100" },
+      { id: 2, type: "Biodegradable Bag", weight: 1.2, date: "2025-04-16", batchId: "BATCH002", transportId: "TRANS101" },
+      { id: 3, type: "Wooden Crate", weight: 5.0, date: "2025-04-17", batchId: "BATCH003", transportId: "TRANS102" },
+      { id: 4, type: "Recycled Plastic", weight: 3.7, date: "2025-04-18", batchId: "BATCH004", transportId: "TRANS103" }
+    ];
 
-    <!-- Add Packaging Info Form -->
-    <div class="col-12">
-      <div class="card shadow mb-4">
-        <div class="card-header fw-bold">📝 Add Packaging Info</div>
-        <div class="card-body">
-          <form>
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">Packaging Type</label>
-                <input type="text" class="form-control" placeholder="e.g. Box, Bag, Crate">
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Weight (kg)</label>
-                <input type="number" step="0.01" class="form-control" placeholder="e.g. 2.5">
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Packaging Date</label>
-                <input type="date" class="form-control">
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Batch ID</label>
-                <input type="text" class="form-control" placeholder="e.g. BATCH123">
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Transport ID</label>
-                <input type="text" class="form-control" placeholder="e.g. TRANS456">
-              </div>
+    let weightChart;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderTable();
+      renderChart();
+      setupForm();
+      setupScrollEffect();
+    });
+
+    function renderTable() {
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
+
+      packagingData.forEach(item => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.id}</td>
+          <td>${item.type}</td>
+          <td>${item.weight}</td>
+          <td>${item.date}</td>
+          <td>${item.batchId}</td>
+          <td>${item.transportId}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="edit-btn" data-id="${item.id}">Edit</button>
+              <button class="delete-btn" data-id="${item.id}">Delete</button>
             </div>
-            <button type="submit" class="btn btn-success mt-3">Add Info</button>
-          </form>
-        </div>
-      </div>
-    </div>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
 
-    <!-- Packaging Records Table -->
-    <div class="col-12">
-      <div class="card shadow mb-4">
-        <div class="card-header fw-bold">📋 Packaging Records</div>
-        <div class="card-body">
-          <table class="table table-striped align-middle text-center">
-            <thead class="table-light">
-              <tr>
-                <th>ID</th>
-                <th>Type</th>
-                <th>Weight</th>
-                <th>Date</th>
-                <th>Batch ID</th>
-                <th>Transport ID</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="table-primary">
-                <td>1</td>
-                <td>EcoBox S</td>
-                <td>2.5</td>
-                <td>2025-04-18</td>
-                <td>BATCH001</td>
-                <td>TRANS100</td>
-                <td>
-                  <button class="btn btn-warning btn-sm me-1">Edit</button>
-                  <button class="btn btn-danger btn-sm">Delete</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Charts -->
-    <div class="col-lg-6">
-      <div class="card shadow mb-4">
-        <div class="card-header fw-bold">🧁 Packaging Weight Distribution</div>
-        <div class="card-body d-flex justify-content-center align-items-center" style="height: 350px;">
-          <div style="width: 100%; max-width: 300px;">
-            <canvas id="weightDistributionChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-6">
-      <div class="card shadow mb-4">
-        <div class="card-header fw-bold">📊 Monthly Packaging Volume</div>
-        <div class="card-body d-flex justify-content-center align-items-center" style="height: 350px;">
-          <div style="width: 100%; max-width: 300px;">
-            <canvas id="monthlyVolumeChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- Footer -->
-<footer class="footer mt-auto">
-  <div>
-    <a href="#">Home</a>
-    <a href="#">Features</a>
-    <a href="#">Pricing</a>
-    <a href="#">FAQs</a>
-    <a href="#">About</a>
-  </div>
-  <div class="mt-2 text-muted">
-    &copy; 2025 Company, Inc
-  </div>
-</footer>
-
-<!-- Chart.js Graphs -->
-<script>
-  // Pie Chart
-  const ctxPie = document.getElementById('weightDistributionChart').getContext('2d');
-  new Chart(ctxPie, {
-    type: 'pie',
-    data: {
-      labels: ['EcoBox S', 'EcoBag M', 'EcoCrate L'],
-      datasets: [{
-        label: 'Weight (kg)',
-        data: [30, 45, 25],
-        backgroundColor: ['#0d6efd', '#198754', '#ffc107'],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'bottom'
-        }
-      }
+      document.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+          const id = parseInt(this.dataset.id);
+          packagingData = packagingData.filter(item => item.id !== id);
+          renderTable();
+          renderChart();
+        });
+      });
     }
-  });
 
-  // Bar Chart
-  const ctxBar = document.getElementById('monthlyVolumeChart').getContext('2d');
-  new Chart(ctxBar, {
-    type: 'bar',
-    data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      datasets: [{
-        label: 'Packages',
-        data: [120, 150, 180, 130, 140, 160, 175, 165, 150, 170, 155, 145],
-        backgroundColor: '#0dcaf0'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true
+    function renderChart() {
+      const ctx = document.getElementById("weightChart").getContext("2d");
+
+      const grouped = packagingData.reduce((acc, item) => {
+        acc[item.type] = (acc[item.type] || 0) + item.weight;
+        return acc;
+      }, {});
+
+      const labels = Object.keys(grouped);
+      const data = Object.values(grouped);
+      const colors = ['#2e8b57cc', '#3cb371cc', '#90ee90cc', '#98fb98cc', '#006400cc'];
+
+      if (weightChart) weightChart.destroy();
+
+      weightChart = new Chart(ctx, {
+        type: "pie",
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: colors,
+            borderColor: "#fff",
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: { color: "white" }
+            },
+            tooltip: {
+              callbacks: {
+                label: context => `${context.label}: ${context.raw} kg`
+              }
+            }
+          }
         }
-      },
-      plugins: {
-        legend: {
-          position: 'bottom'
-        }
-      }
+      });
     }
-  });
-</script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    function setupForm() {
+      document.getElementById("packagingForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const newId = packagingData.length ? Math.max(...packagingData.map(i => i.id)) + 1 : 1;
+        packagingData.push({
+          id: newId,
+          type: document.getElementById("packaging-type").value,
+          weight: parseFloat(document.getElementById("weight").value),
+          date: document.getElementById("packaging-date").value,
+          batchId: document.getElementById("batch-id").value,
+          transportId: document.getElementById("transport-id").value
+        });
+        this.reset();
+        renderTable();
+        renderChart();
+      });
+    }
+
+    function setupScrollEffect() {
+      const navbar = document.getElementById("navbar");
+      window.addEventListener("scroll", () => {
+        navbar.classList.toggle("scrolled", window.scrollY > 50);
+      });
+    }
+  </script>
 </body>
 </html>
