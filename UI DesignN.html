@@ -148,64 +148,6 @@
       margin: 0 auto;
     }
 
-    .transparent-form {
-      background-color: transparent;
-      padding: 30px;
-      margin-bottom: 40px;
-    }
-
-    .form-title {
-      font-size: 24px;
-      font-weight: bold;
-      color: white;
-      margin-bottom: 25px;
-      text-align: center;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-      text-align: left;
-      color: white;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 4px;
-      background-color: rgba(255, 255, 255, 0.8);
-    }
-
-    .form-row {
-      display: flex;
-      gap: 20px;
-    }
-
-    .form-row .form-group {
-      flex: 1;
-    }
-
-    .submit-btn {
-      background-color: rgba(46, 139, 87, 0.9);
-      color: white;
-      padding: 10px 20px;
-      font-weight: bold;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      display: block;
-      margin: 0 auto;
-      margin-top: 10px;
-    }
-
     @media (max-width: 768px) {
       header {
         flex-direction: column;
@@ -220,10 +162,6 @@
 
       nav ul li {
         margin: 5px 15px;
-      }
-
-      .form-row {
-        flex-direction: column;
       }
 
       .search-container {
@@ -255,34 +193,7 @@
 
   <section class="hero">
     <div class="hero-content">
-      <form class="transparent-form" id="packagingForm">
-        <h2 class="form-title">Add Packaging Info</h2>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="packaging-type">Packaging Type</label>
-            <input type="text" id="packaging-type" required>
-          </div>
-          <div class="form-group">
-            <label for="weight">Weight (kg)</label>
-            <input type="number" id="weight" step="0.01" required>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="packaging-date">Packaging Date</label>
-            <input type="date" id="packaging-date" required>
-          </div>
-          <div class="form-group">
-            <label for="batch-id">Batch ID</label>
-            <input type="text" id="batch-id" required>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="transport-id">Transport ID</label>
-          <input type="text" id="transport-id" required>
-        </div>
-        <button type="submit" class="submit-btn">Add Packaging Info</button>
-      </form>
+      <!-- Packaging Info form removed -->
     </div>
   </section>
 
