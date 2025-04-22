@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Green Harvest</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      color: #333;
+      background-color: #f0f4f1;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 50px;
+      background-color: transparent;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 100;
+      transition: all 0.3s ease;
+    }
+
+    header.scrolled {
+      background-color: rgba(46, 139, 87, 0.9);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    header.scrolled .logo,
+    header.scrolled nav ul li a {
+      color: white;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      margin-right: 20px;
+    }
+
+    nav ul li {
+      margin-left: 30px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 5px 0;
+      position: relative;
+    }
+
+    nav ul li a:hover {
+      color: #d4f7dc;
+    }
+
+    nav ul li a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: white;
+      transition: width 0.3s ease;
+    }
+
+    nav ul li a:hover::after {
+      width: 100%;
+    }
+
+    .search-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #searchInput {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      width: 200px;
+    }
+
+    .search-btn {
+      background-color: rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .hero {
+      text-align: center;
+      padding: 200px 20px 100px;
+      background-image: url('image/backgraund.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: white;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 0;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .transparent-form {
+      background-color: transparent;
+      padding: 30px;
+      margin-bottom: 40px;
+    }
+
+    .form-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 25px;
+      text-align: center;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+      color: white;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 20px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .submit-btn {
+      background-color: rgba(46, 139, 87, 0.9);
+      color: white;
+      padding: 10px 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        padding: 15px;
+      }
+
+      nav ul {
+        margin-top: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      nav ul li {
+        margin: 5px 15px;
+      }
+
+      .form-row {
+        flex-direction: column;
+      }
+
+      .search-container {
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header id="navbar">
+    <div class="logo">Eco Harvest</div>
+    <nav>
+      <ul>
+        <li><a href="#">Dashboard</a></li>
+        <li><a href="#">Quality Report</a></li>
+        <li><a href="#">Greaded Produced</a></li>
+        <li><a href="#">Suply Chain</a></li>
+        <li><a href="#">Quality Analysis</a></li>
+        <li><a href="#">Packaging</a></li>
+        <li><a href="#">Transportation</a></li>
+        <li><a href="#">Logout</a></li>
+      </ul>
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search...">
+        <button class="search-btn" onclick="performSearch()">Search</button>
+      </div>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <form class="transparent-form" id="packagingForm">
+        <h2 class="form-title">Add Packaging Info</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="packaging-type">Packaging Type</label>
+            <input type="text" id="packaging-type" required>
+          </div>
+          <div class="form-group">
+            <label for="weight">Weight (kg)</label>
+            <input type="number" id="weight" step="0.01" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="packaging-date">Packaging Date</label>
+            <input type="date" id="packaging-date" required>
+          </div>
+          <div class="form-group">
+            <label for="batch-id">Batch ID</label>
+            <input type="text" id="batch-id" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="transport-id">Transport ID</label>
+          <input type="text" id="transport-id" required>
+        </div>
+        <button type="submit" class="submit-btn">Add Packaging Info</button>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    function setupScrollEffect() {
+      const navbar = document.getElementById("navbar");
+      window.addEventListener("scroll", () => {
+        navbar.classList.toggle("scrolled", window.scrollY > 50);
+      });
+    }
+
+    function performSearch() {
+      const query = document.getElementById("searchInput").value;
+      if (query.trim() !== "") {
+        console.log("Searching for:", query);
+        // You can implement actual search logic here
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      setupScrollEffect();
+    });
+  </script>
+</body>
+</html>
