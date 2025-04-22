@@ -355,151 +355,99 @@
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    let packagingData = [
-      { id: 1, type: "Eco Box", weight: 2.5, date: "2025-04-15", batchId: "BATCH001", transportId: "TRANS100" },
-      { id: 2, type: "Biodegradable Bag", weight: 1.2, date: "2025-04-16", batchId: "BATCH002", transportId: "TRANS101" },
-      { id: 3, type: "Wooden Crate", weight: 5.0, date: "2025-04-17", batchId: "BATCH003", transportId: "TRANS102" },
-      { id: 4, type: "Recycled Plastic", weight: 3.7, date: "2025-04-18", batchId: "BATCH004", transportId: "TRANS103" }
-    ];
+<script>
+  let packagingData = [
+    { id: 1, type: "Eco Box", weight: 2.5, date: "2025-04-15", batchId: "BATCH001", transportId: "TRANS100" },
+    { id: 2, type: "Biodegradable Bag", weight: 1.2, date: "2025-04-16", batchId: "BATCH002", transportId: "TRANS101" },
+    { id: 3, type: "Wooden Crate", weight: 5.0, date: "2025-04-17", batchId: "BATCH003", transportId: "TRANS102" },
+    { id: 4, type: "Recycled Plastic", weight: 3.7, date: "2025-04-18", batchId: "BATCH004", transportId: "TRANS103" }
+  ];
 
-    let weightChart;
-    let volumeChart;
+  let weightChart;
+  let volumeChart;
 
-    document.addEventListener("DOMContentLoaded", () => {
-      renderTable();
-      renderCharts();
-      setupForm();
-      setupScrollEffect();
+  document.addEventListener("DOMContentLoaded", () => {
+    renderCharts();
+    setupScrollEffect();
+  });
+
+  function renderCharts() {
+    const ctxPie = document.getElementById("weightChart").getContext("2d");
+    const ctxBar = document.getElementById("volumeChart").getContext("2d");
+
+    const grouped = packagingData.reduce((acc, item) => {
+      acc[item.type] = (acc[item.type] || 0) + item.weight;
+      return acc;
+    }, {});
+    const labels = Object.keys(grouped);
+    const weights = Object.values(grouped);
+    const colors = ['#2e8b57cc', '#3cb371cc', '#90ee90cc', '#98fb98cc', '#006400cc'];
+
+    if (weightChart) weightChart.destroy();
+    if (volumeChart) volumeChart.destroy();
+
+    weightChart = new Chart(ctxPie, {
+      type: "pie",
+      data: {
+        labels: labels,
+        datasets: [{
+          data: weights,
+          backgroundColor: colors,
+          borderColor: "#fff",
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { color: "white" }
+          },
+          tooltip: {
+            callbacks: {
+              label: context => `${context.label}: ${context.raw} kg`
+            }
+          }
+        }
+      }
     });
 
-    function renderTable() {
-      const tbody = document.getElementById("tableBody");
-      tbody.innerHTML = "";
-
-      packagingData.forEach(item => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${item.id}</td>
-          <td>${item.type}</td>
-          <td>${item.weight}</td>
-          <td>${item.date}</td>
-          <td>${item.batchId}</td>
-          <td>${item.transportId}</td>
-          <td>
-            <div class="action-buttons">
-              <button class="edit-btn" data-id="${item.id}">Edit</button>
-              <button class="delete-btn" data-id="${item.id}">Delete</button>
-            </div>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
-
-      document.querySelectorAll(".delete-btn").forEach(btn => {
-        btn.addEventListener("click", function () {
-          const id = parseInt(this.dataset.id);
-          packagingData = packagingData.filter(item => item.id !== id);
-          renderTable();
-          renderCharts();
-        });
-      });
-    }
-
-    function renderCharts() {
-      const ctxPie = document.getElementById("weightChart").getContext("2d");
-      const ctxBar = document.getElementById("volumeChart").getContext("2d");
-
-      const grouped = packagingData.reduce((acc, item) => {
-        acc[item.type] = (acc[item.type] || 0) + item.weight;
-        return acc;
-      }, {});
-      const labels = Object.keys(grouped);
-      const weights = Object.values(grouped);
-      const colors = ['#2e8b57cc', '#3cb371cc', '#90ee90cc', '#98fb98cc', '#006400cc'];
-
-      if (weightChart) weightChart.destroy();
-      if (volumeChart) volumeChart.destroy();
-
-      weightChart = new Chart(ctxPie, {
-        type: "pie",
-        data: {
-          labels: labels,
-          datasets: [{
-            data: weights,
-            backgroundColor: colors,
-            borderColor: "#fff",
-            borderWidth: 1
-          }]
+    volumeChart = new Chart(ctxBar, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Volume (kg)",
+          data: weights,
+          backgroundColor: colors
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: { ticks: { color: "white" } },
+          y: {
+            ticks: { color: "white" },
+            beginAtZero: true
+          }
         },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: { color: "white" }
-            },
-            tooltip: {
-              callbacks: {
-                label: context => `${context.label}: ${context.raw} kg`
-              }
-            }
+        plugins: {
+          legend: {
+            labels: { color: "white" }
           }
         }
-      });
+      }
+    });
+  }
 
-      volumeChart = new Chart(ctxBar, {
-        type: "bar",
-        data: {
-          labels: labels,
-          datasets: [{
-            label: "Volume (kg)",
-            data: weights,
-            backgroundColor: colors
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            x: { ticks: { color: "white" } },
-            y: {
-              ticks: { color: "white" },
-              beginAtZero: true
-            }
-          },
-          plugins: {
-            legend: {
-              labels: { color: "white" }
-            }
-          }
-        }
-      });
-    }
+  function setupScrollEffect() {
+    const navbar = document.getElementById("navbar");
+    window.addEventListener("scroll", () => {
+      navbar.classList.toggle("scrolled", window.scrollY > 50);
+    });
+  }
+</script>
 
-    function setupForm() {
-      document.getElementById("packagingForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-        const newId = packagingData.length ? Math.max(...packagingData.map(i => i.id)) + 1 : 1;
-        packagingData.push({
-          id: newId,
-          type: document.getElementById("packaging-type").value,
-          weight: parseFloat(document.getElementById("weight").value),
-          date: document.getElementById("packaging-date").value,
-          batchId: document.getElementById("batch-id").value,
-          transportId: document.getElementById("transport-id").value
-        });
-        this.reset();
-        renderTable();
-        renderCharts();
-      });
-    }
-
-    function setupScrollEffect() {
-      const navbar = document.getElementById("navbar");
-      window.addEventListener("scroll", () => {
-        navbar.classList.toggle("scrolled", window.scrollY > 50);
-      });
-    }
-  </script>
 </body>
 </html>

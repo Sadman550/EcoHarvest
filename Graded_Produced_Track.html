@@ -1,167 +1,256 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>EcoHarvest</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoHarvest - Grading Tracking</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <style>
     body {
       margin: 0;
       padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f1;
+      color: white;
     }
 
-    .sidebar {
-      width: 220px;
+    header {
       position: fixed;
       top: 0;
       left: 0;
-      height: 100vh;
-      background-color: #e9ecef;
-      padding: 1rem;
-      border-right: 1px solid #dee2e6;
+      width: 100%;
+      background-color: transparent;
+      padding: 20px 50px;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
     }
 
-    .main-content {
-      margin-left: 220px;
+    header.scrolled {
+      background-color: rgba(46, 139, 87, 0.9);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
 
-    .main-header {
-      background-color: #f8f9fa;
-      border-bottom: 1px solid #dee2e6;
-      padding: 1.25rem 0;
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 30px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+    }
+
+    .hero {
+      padding: 200px 20px 100px;
+      background: url('image/backgraund.png') no-repeat center center/cover;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 0;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .form-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
       text-align: center;
+    }
+
+    .form-control {
+      background-color: rgba(255, 255, 255, 0.9);
+      color: #000;
+    }
+
+    .form-section, .table-section {
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(6px);
+      padding: 25px;
+      border-radius: 10px;
+      margin-bottom: 40px;
+    }
+
+    .table thead th {
+      background-color: rgba(46, 139, 87, 0.6);
+      color: white;
+    }
+
+    .table tbody td {
+      background-color: rgba(255, 255, 255, 0.9);
+      color: black;
+    }
+
+    .btn-success {
+      background-color: rgba(46, 139, 87, 0.9);
+      border: none;
+    }
+
+    .btn-success:hover {
+      background-color: #2e8b57;
     }
 
     .footer {
-      border-top: 1px solid #dee2e6;
-      padding: 1rem 0;
       text-align: center;
-      font-size: 0.9rem;
-      background-color: #e9ecef;
+      padding: 20px;
+      font-size: 14px;
+      background-color: rgba(255, 255, 255, 0.05);
+      color: #ddd;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    /* Sidebar Hover Animation */
-    .nav-link {
-      transition: all 0.3s ease;
-      border-radius: 8px;
-      padding: 8px 10px;
+    .modal-content {
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      backdrop-filter: blur(5px);
+      border-radius: 10px;
     }
 
-    .nav-link:hover {
-      background-color: #0d6efd;
-      color: white !important;
-      transform: translateX(5px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    @media (max-width: 768px) {
+      nav ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
     }
   </style>
 </head>
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-  <div class="d-flex align-items-center mb-3">
-    <i class="bi bi-bootstrap-fill fs-4 me-2 text-primary"></i>
-    <strong>Sidebar</strong>
+<header id="navbar">
+  <div class="logo">EcoHarvest</div>
+  <nav>
+    <ul>
+      <li><a href="#">Dashboard</a></li>
+      <li><a href="#"></a></li>
+      <li><a href="#">Packaging</a></li>
+      <li><a href="#">Quality</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-content">
+
+    <div class="form-section">
+      <h2 class="form-title">Add Graded Product</h2>
+      <form class="row g-3">
+        <div class="col-md-3">
+          <label for="grade" class="form-label">Grade</label>
+          <input type="text" class="form-control" id="grade" placeholder="e.g. Grade A">
+        </div>
+        <div class="col-md-3">
+          <label for="product" class="form-label">Product</label>
+          <input type="text" class="form-control" id="product" placeholder="e.g. Mango">
+        </div>
+        <div class="col-md-3">
+          <label for="product-weight" class="form-label">Weight</label>
+          <input type="text" class="form-control" id="weight" placeholder="e.g. 2 kg">
+        </div>
+        <div class="col-md-3">
+          <label for="track" class="form-label">Tracking Info</label>
+          <input type="text" class="form-control" id="track" placeholder="e.g. Farm ➝ Market">
+        </div>
+        <div class="col-md-12 text-center">
+          <button type="button" onclick="addRow()" class="btn btn-success px-4 mt-3">Add</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="table-section">
+      <h2 class="form-title">📋 Product Tracking Table</h2>
+      <table class="table table-bordered text-center" id="dataTable">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Grade</th>
+            <th>Product</th>
+            <th>Weight</th>
+            <th>Track</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
   </div>
-  <hr>
-  <ul class="nav flex-column">
-    <li class="nav-item mb-2">
-      <a href="#" class="nav-link active bg-primary text-white d-flex align-items-center">
-        <i class="bi bi-house-door me-2"></i> Graded Products
-      </a>
-    </li>
-    <li class="nav-item mb-2">
-      <a href="packaging_tracking.html" class="nav-link text-dark d-flex align-items-center">
-        <i class="bi bi-leaf me-2"></i> Packaging Tracking
-      </a>
-    </li>
-    <li class="nav-item mb-2">
-      <a href="qualityreport.html" class="nav-link text-dark d-flex align-items-center">
-        <i class="bi bi-clipboard-check me-2"></i> Quality Report
-      </a>
-    </li>
-  </ul>
-</div>
+</section>
 
-<!-- Main Content -->
-<div class="main-content">
-
-  <!-- Header -->
-  <header class="main-header">
-    <h4 class="mb-0 fw-bold">Graded Produced Track</h4>
-  </header>
-
-  <!-- Body -->
-  <div class="container-fluid p-4">
-    <div class="card shadow mb-4">
-      <div class="card-header fw-bold">📝 Add Product Info</div>
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-3">
-            <label class="form-label">Grade:</label>
-            <input type="text" id="grade" class="form-control" placeholder="e.g. Grade A">
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">Product Name:</label>
-            <input type="text" id="product" class="form-control" placeholder="e.g. Mango">
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">Weight:</label>
-            <input type="text" id="Weight" class="form-control" placeholder="e.g. 2 k.g">
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">Tracking Info:</label>
-            <input type="text" id="track" class="form-control" placeholder="e.g. Farm ➝ Market">
-          </div>
-          <div class="col-md-2 d-grid">
-            <label class="form-label">&nbsp;</label>
-            <button onclick="addRow()" class="btn btn-success">Add</button>
-          </div>
+<!-- Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">Edit Graded Product</h5>
+        <button type="button" class="btn-close bg-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="editGrade" class="form-label">Grade</label>
+          <input type="text" id="editGrade" class="form-control" placeholder="Edit Grade">
+        </div>
+        <div class="mb-3">
+          <label for="editProduct" class="form-label">Product</label>
+          <input type="text" id="editProduct" class="form-control" placeholder="Edit Product">
+        </div>
+        <div class="mb-3">
+          <label for="editWeight" class="form-label">Weight (kg)</label>
+          <input type="text" id="editWeight" class="form-control" placeholder="Edit Weight (kg)">
+        </div>
+        <div class="mb-3">
+          <label for="editTrack" class="form-label">Tracking Info</label>
+          <input type="text" id="editTrack" class="form-control" placeholder="Edit Tracking Info">
         </div>
       </div>
-    </div>
 
-    <!-- Table -->
-    <div class="card shadow">
-      <div class="card-header fw-bold">📋 Product Tracking Table</div>
-      <div class="card-body">
-        <table class="table table-bordered text-center" id="dataTable">
-          <thead class="table-light">
-            <tr>
-              <th>No</th>
-              <th>Grade</th>
-              <th>Product</th>
-              <th>Track</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <!-- Dynamic rows here -->
-          </tbody>
-        </table>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success" onclick="applyEdit()">Update</button>
       </div>
     </div>
   </div>
-
-  <!-- Footer -->
-  <footer class="footer mt-auto">
-    <div class="text-muted">
-      &copy; 2025 EcoHarvest. All rights reserved.
-    </div>
-  </footer>
-
 </div>
+
+<footer class="footer">
+  &copy; 2025 EcoHarvest. All rights reserved.
+</footer>
 
 <script>
   let count = 1;
+  let currentRow = null;
 
   function addRow() {
     const grade = document.getElementById('grade').value.trim();
     const product = document.getElementById('product').value.trim();
+    const weight = document.getElementById('weight').value.trim();
     const track = document.getElementById('track').value.trim();
 
-    if (!grade || !product || !track) {
+    if (!grade || !product || !weight || !track) {
       alert("Please fill all fields!");
       return;
     }
@@ -172,6 +261,7 @@
       <td>${count++}</td>
       <td>${grade}</td>
       <td>${product}</td>
+      <td>${weight}</td>
       <td>${track}</td>
       <td>
         <button class="btn btn-warning btn-sm me-1" onclick="editRow(this)">Edit</button>
@@ -181,6 +271,7 @@
 
     document.getElementById('grade').value = '';
     document.getElementById('product').value = '';
+    document.getElementById('weight').value = '';
     document.getElementById('track').value = '';
   }
 
@@ -193,17 +284,40 @@
   }
 
   function editRow(btn) {
-    const row = btn.closest("tr");
-    const grade = prompt("Edit Grade:", row.cells[1].innerText);
-    const product = prompt("Edit Product:", row.cells[2].innerText);
-    const track = prompt("Edit Track Info:", row.cells[3].innerText);
+    currentRow = btn.closest("tr");
 
-    if (grade && product && track) {
-      row.cells[1].innerText = grade;
-      row.cells[2].innerText = product;
-      row.cells[3].innerText = track;
-    }
+    const grade = currentRow.cells[1].innerText;
+    const product = currentRow.cells[2].innerText;
+    const weight = currentRow.cells[3].innerText;
+    const track = currentRow.cells[4].innerText;
+
+    document.getElementById("editGrade").value = grade;
+    document.getElementById("editProduct").value = product;
+    document.getElementById("editWeight").value = weight;
+    document.getElementById("editTrack").value = track;
+
+    const modal = new bootstrap.Modal(document.getElementById("editModal"));
+    modal.show();
   }
+
+  function applyEdit() {
+    const newGrade = document.getElementById("editGrade").value.trim();
+    const newProduct = document.getElementById("editProduct").value.trim();
+    const newWeight = document.getElementById("editWeight").value.trim();
+    const newTrack = document.getElementById("editTrack").value.trim();
+
+    if (newGrade) currentRow.cells[1].innerText = newGrade;
+    if (newProduct) currentRow.cells[2].innerText = newProduct;
+    if (newWeight) currentRow.cells[3].innerText = newWeight;
+    if (newTrack) currentRow.cells[4].innerText = newTrack;
+
+    bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+  }
+
+  window.addEventListener("scroll", function () {
+    const navbar = document.getElementById("navbar");
+    navbar.classList.toggle("scrolled", window.scrollY > 50);
+  });
 </script>
 
 </body>
