@@ -22,7 +22,7 @@
       font-weight: 500;
       position: relative;
       transition: all 0.3s ease;
-      border-radius: 5px;
+      border-radius: 50px;  /* Round indicator */
     }
 
     nav ul li a:hover,
@@ -30,7 +30,7 @@
       background-color: rgba(40, 167, 69, 0.8);
       color: #fff !important;
       box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
-      /* font-weight removed to prevent shaking */
+      border-radius: 50px;  /* Keep the round effect on hover and active */
     }
 
     /* Reuse style for Add Button */
@@ -154,16 +154,20 @@
 <body>
 
 <header id="navbar">
-  <div class="logo">EcoHarvest</div>
+  <div class="logo d-flex align-items-center">
+    <img src="Logo/logo-transparent (2.1).PNG" style="height: 60px; width: auto; margin-right: 10px;">
+    <span>Eco Harvest</span>
+  </div>
   <nav>
     <ul>
       <li><a href="Dashboard.html">Dashboard</a></li>
-      <li><a href="#">Packaging</a></li>
-      <li><a href="#">Quality</a></li>
-      <li><a href="#" class="active">Grading</a></li>
-      <li><a href="#">Tracking</a></li>
+      <li><a href="Quality_Report.html">Quality Report</a></li>
+      <li><a href="Quality_analysis.html">Quality Analysis</a></li>
+      <li><a href="Graded_Produced_Track.html" class = "active">Graded Produced</a></li>
+      <li><a href="packaging_tracking.html">Packaging</a></li>
+      <li><a href="Transportation.html">Transportation</a></li>
+      <li><a href="Supply_Chain.html">Supply Chain</a></li>
       <li><a href="login.html">Logout</a></li>
-      <li><a href="#">Profile</a></li>
     </ul>
   </nav>
 </header>
@@ -278,8 +282,8 @@
       <td>${weight}</td>
       <td>${track}</td>
       <td>
-        <button class="btn btn-warning btn-sm me-1" onclick="editRow(this)">Edit</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteRow(this)">Delete</button>
+        <button class="btn btn-warning" onclick="editRow(this)">Edit</button>
+        <button class="btn btn-danger" onclick="deleteRow(this)">Delete</button>
       </td>
     `;
 
@@ -289,43 +293,42 @@
     document.getElementById('track').value = '';
   }
 
-  function deleteRow(btn) {
-    const row = btn.closest("tr");
-    row.remove();
-    const rows = document.querySelectorAll("#tableBody tr");
-    count = 1;
-    rows.forEach((r, i) => r.cells[0].innerText = count++);
-  }
+  function editRow(button) {
+    const row = button.parentElement.parentElement;
+    currentRow = row;
 
-  function editRow(btn) {
-    currentRow = btn.closest("tr");
+    document.getElementById('editGrade').value = row.cells[1].textContent;
+    document.getElementById('editProduct').value = row.cells[2].textContent;
+    document.getElementById('editWeight').value = row.cells[3].textContent;
+    document.getElementById('editTrack').value = row.cells[4].textContent;
 
-    const grade = currentRow.cells[1].innerText;
-    const product = currentRow.cells[2].innerText;
-    const weight = currentRow.cells[3].innerText;
-    const track = currentRow.cells[4].innerText;
-
-    document.getElementById("editGrade").value = grade;
-    document.getElementById("editProduct").value = product;
-    document.getElementById("editWeight").value = weight;
-    document.getElementById("editTrack").value = track;
-
-    const modal = new bootstrap.Modal(document.getElementById("editModal"));
+    const modal = new bootstrap.Modal(document.getElementById('editModal'));
     modal.show();
   }
 
   function applyEdit() {
-    const newGrade = document.getElementById("editGrade").value.trim();
-    const newProduct = document.getElementById("editProduct").value.trim();
-    const newWeight = document.getElementById("editWeight").value.trim();
-    const newTrack = document.getElementById("editTrack").value.trim();
+    const grade = document.getElementById('editGrade').value.trim();
+    const product = document.getElementById('editProduct').value.trim();
+    const weight = document.getElementById('editWeight').value.trim();
+    const track = document.getElementById('editTrack').value.trim();
 
-    if (newGrade) currentRow.cells[1].innerText = newGrade;
-    if (newProduct) currentRow.cells[2].innerText = newProduct;
-    if (newWeight) currentRow.cells[3].innerText = newWeight;
-    if (newTrack) currentRow.cells[4].innerText = newTrack;
+    if (!grade || !product || !weight || !track) {
+      alert("Please fill all fields!");
+      return;
+    }
 
-    bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+    currentRow.cells[1].textContent = grade;
+    currentRow.cells[2].textContent = product;
+    currentRow.cells[3].textContent = weight;
+    currentRow.cells[4].textContent = track;
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+    modal.hide();
+  }
+
+  function deleteRow(button) {
+    const row = button.parentElement.parentElement;
+    row.remove();
   }
 </script>
 
