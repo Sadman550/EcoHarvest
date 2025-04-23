@@ -1,178 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Green Harvest</title>
-  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="min-h-screen">
+
   <header id="navbar">
-    <div class="logo">Eco Harvest</div>
+    <div class="logo d-flex align-items-center">
+      <span>Eco Harvest</span>
+    </div>
     <nav>
       <ul>
-        <li><a href="#">Dashboard</a></li>
+        <li><a href="Dashboard.html">Dashboard</a></li>
         <li><a href="#">Quality Report</a></li>
-        <li><a href="#">Greaded Produced</a></li>
-        <li><a href="#">Suply Chain</a></li>
+        <li><a href="Graded_Produced_Track.html">Graded Produced</a></li>
+        <li><a href="#">Supply Chain</a></li>
         <li><a href="#">Quality Analysis</a></li>
-        <li><a href="#">Packaging</a></li>
+        <li><a href="packaging_tracking.html" class="active">Packaging</a></li>
         <li><a href="#">Transportation</a></li>
-        <li><a href="#">Logout</a></li>
+        <li><a href="login.html">Logout</a></li>
       </ul>
     </nav>
   </header>
 
-  <section class="hero">
-    <div class="hero-content">
-      <div class="transparent-table-container">
-        <h2 class="form-title">Packaging Records</h2>
-        <table class="transparent-table" id="packagingTable">
-          <thead>
+  <section class="pt-28 pb-16 px-6 md:px-12 max-w-7xl mx-auto">
+
+    <div class="mt-16 max-w-6xl mx-auto rounded-3xl shadow-lg border border-green-300 p-6 md:p-10">
+      <h2 class="text-3xl font-extrabold text-green-800 mb-8 text-center drop-shadow-md">Packaging Records</h2>
+      <div class="overflow-x-auto scrollbar-thin rounded-lg">
+        <table class="min-w-full border-collapse text-left">
+          <thead class="bg-green-600 bg-opacity-90 text-white text-sm md:text-base rounded-t-lg">
             <tr>
-              <th>ID</th>
-              <th>Type</th>
-              <th>Weight</th>
-              <th>Date</th>
-              <th>Batch ID</th>
-              <th>Transport ID</th>
-              <th>Actions</th>
+              <th class="py-3 px-4 font-semibold">ID</th>
+              <th class="py-3 px-4 font-semibold">Type</th>
+              <th class="py-3 px-4 font-semibold">Weight (kg)</th>
+              <th class="py-3 px-4 font-semibold">Date</th>
+              <th class="py-3 px-4 font-semibold">Batch ID</th>
+              <th class="py-3 px-4 font-semibold">Transport ID</th>
+              <th class="py-3 px-4 font-semibold text-center">Actions</th>
             </tr>
           </thead>
-          <tbody id="tableBody"></tbody>
+          <tbody id="tableBody" class="text-green-900 text-sm md:text-base divide-y divide-green-200">
+          </tbody>
         </table>
       </div>
-      <form class="transparent-form" id="packagingForm">
-        <h2 class="form-title">Add Packaging Info</h2>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="packaging-type">Packaging Type</label>
-            <input type="text" id="packaging-type" required>
+    </div>
+
+    <!-- Add mt-16 below to add spacing -->
+    <div class="rounded-3xl max-w-4xl mx-auto mt-16 p-8 md:p-12 border border-green-300">
+      <h2 class="text-3xl font-extrabold text-green-800 mb-8 text-center drop-shadow-md">Add Packaging Info</h2>
+      <form id="packagingForm" class="space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="packaging-type" class="block text-green-900 font-semibold mb-2">Packaging Type</label>
+            <input type="text" id="packaging-type" required placeholder="e.g. Eco Box" class="w-full rounded-lg border border-green-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition" />
           </div>
-          <div class="form-group">
-            <label for="weight">Weight (kg)</label>
-            <input type="number" id="weight" step="0.01" required>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="packaging-date">Packaging Date</label>
-            <input type="date" id="packaging-date" required>
+          <div>
+            <label for="weight" class="block text-green-900 font-semibold mb-2">Weight (kg)</label>
+            <input type="number" id="weight" step="0.01" required placeholder="e.g. 2.5" class="w-full rounded-lg border border-green-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition" />
           </div>
         </div>
-        <div class="form-group">
-          <label for="transport-id">Transport ID</label>
-          <input type="text" id="transport-id" required>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="packaging-date" class="block text-green-900 font-semibold mb-2">Packaging Date</label>
+            <input type="date" id="packaging-date" required class="w-full rounded-lg border border-green-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition" />
+          </div>
+          <div>
+            <label for="batch-id" class="block text-green-900 font-semibold mb-2">Batch ID</label>
+            <input type="text" id="batch-id" required placeholder="e.g. BATCH001" class="w-full rounded-lg border border-green-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition" />
+          </div>
         </div>
-        <button type="submit" class="submit-btn">Add Packaging Info</button>
+        <div>
+          <label for="transport-id" class="block text-green-900 font-semibold mb-2">Transport ID</label>
+          <input type="text" id="transport-id" required placeholder="e.g. TRANS100" class="w-full rounded-lg border border-green-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition" />
+        </div>
+        <button type="submit" class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition flex items-center justify-center gap-2">
+          <i class="fas fa-plus-circle"></i> Add Packaging Info
+        </button>
       </form>
-      <div class="charts-flex">
-        <div class="chart-container">
-          <h2 class="chart-title">Packaging Weight Distribution</h2>
-          <canvas id="weightChart"></canvas>
-        </div>
-        <div class="chart-container">
-          <h2 class="chart-title">Monthly Packaging Volume</h2>
-          <canvas id="volumeChart"></canvas>
-        </div>
-      </div>
     </div>
   </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  let packagingData = [
-    { id: 1, type: "Eco Box", weight: 2.5, date: "2025-04-15", batchId: "BATCH001", transportId: "TRANS100" },
-    { id: 2, type: "Biodegradable Bag", weight: 1.2, date: "2025-04-16", batchId: "BATCH002", transportId: "TRANS101" },
-    { id: 3, type: "Wooden Crate", weight: 5.0, date: "2025-04-17", batchId: "BATCH003", transportId: "TRANS102" },
-    { id: 4, type: "Recycled Plastic", weight: 3.7, date: "2025-04-18", batchId: "BATCH004", transportId: "TRANS103" }
-  ];
+  <script>
+    let packagingInfo = [];
+    let currentEditIndex = -1;
 
-  let weightChart;
-  let volumeChart;
+    const packagingForm = document.getElementById("packagingForm");
+    const tableBody = document.getElementById("tableBody");
 
-  document.addEventListener("DOMContentLoaded", () => {
-    renderCharts();
-    setupScrollEffect();
-  });
+    function updateTable() {
+      tableBody.innerHTML = "";
+      packagingInfo.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="py-3 px-4">${index + 1}</td>
+          <td class="py-3 px-4">${item.type}</td>
+          <td class="py-3 px-4">${item.weight}</td>
+          <td class="py-3 px-4">${item.date}</td>
+          <td class="py-3 px-4">${item.batchId}</td>
+          <td class="py-3 px-4">${item.transportId}</td>
+          <td class="py-3 px-4 text-center">
+            <button class="edit-btn" onclick="editPackaging(${index})">Edit</button>
+            <button class="delete-btn" onclick="deletePackaging(${index})">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
 
-  function renderCharts() {
-    const ctxPie = document.getElementById("weightChart").getContext("2d");
-    const ctxBar = document.getElementById("volumeChart").getContext("2d");
+    function addPackagingInfo(event) {
+      event.preventDefault();
 
-    const grouped = packagingData.reduce((acc, item) => {
-      acc[item.type] = (acc[item.type] || 0) + item.weight;
-      return acc;
-    }, {});
-    const labels = Object.keys(grouped);
-    const weights = Object.values(grouped);
-    const colors = ['#2e8b57cc', '#3cb371cc', '#90ee90cc', '#98fb98cc', '#006400cc'];
+      const newPackaging = {
+        type: document.getElementById("packaging-type").value,
+        weight: document.getElementById("weight").value,
+        date: document.getElementById("packaging-date").value,
+        batchId: document.getElementById("batch-id").value,
+        transportId: document.getElementById("transport-id").value,
+      };
 
-    if (weightChart) weightChart.destroy();
-    if (volumeChart) volumeChart.destroy();
-
-    weightChart = new Chart(ctxPie, {
-      type: "pie",
-      data: {
-        labels: labels,
-        datasets: [{
-          data: weights,
-          backgroundColor: colors,
-          borderColor: "#fff",
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "bottom",
-            labels: { color: "white" }
-          },
-          tooltip: {
-            callbacks: {
-              label: context => `${context.label}: ${context.raw} kg`
-            }
-          }
-        }
+      if (currentEditIndex !== -1) {
+        packagingInfo[currentEditIndex] = newPackaging;
+        currentEditIndex = -1;
+      } else {
+        packagingInfo.push(newPackaging);
       }
-    });
 
-    volumeChart = new Chart(ctxBar, {
-      type: "bar",
-      data: {
-        labels: labels,
-        datasets: [{
-          label: "Volume (kg)",
-          data: weights,
-          backgroundColor: colors
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          x: { ticks: { color: "white" } },
-          y: {
-            ticks: { color: "white" },
-            beginAtZero: true
-          }
-        },
-        plugins: {
-          legend: {
-            labels: { color: "white" }
-          }
-        }
-      }
-    });
-  }
+      document.getElementById("packagingForm").reset();
+      updateTable();
+    }
 
-  function setupScrollEffect() {
-    const navbar = document.getElementById("navbar");
-    window.addEventListener("scroll", () => {
-      navbar.classList.toggle("scrolled", window.scrollY > 50);
-    });
-  }
-</script>
+    function editPackaging(index) {
+      const item = packagingInfo[index];
+      document.getElementById("packaging-type").value = item.type;
+      document.getElementById("weight").value = item.weight;
+      document.getElementById("packaging-date").value = item.date;
+      document.getElementById("batch-id").value = item.batchId;
+      document.getElementById("transport-id").value = item.transportId;
 
+      currentEditIndex = index;
+    }
+
+    function deletePackaging(index) {
+      packagingInfo.splice(index, 1);
+      updateTable();
+    }
+
+    packagingForm.addEventListener("submit", addPackagingInfo);
+  </script>
 </body>
 </html>
