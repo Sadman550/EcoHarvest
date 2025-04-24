@@ -38,6 +38,15 @@
     <!-- Packaging Records Table -->
     <div class="mt-4 bg-white bg-opacity-75 p-4 p-md-5 rounded-4 border border-success shadow-sm">
       <h2 class="text-center text-success fw-bold mb-4">Packaging Records</h2>
+
+      <!-- Search Bar -->
+      <div class="d-flex justify-content-end mb-3">
+        <div class="input-group" style="max-width: 300px;">
+          <input type="text" id="searchInput" class="form-control border-success" placeholder="Search...">
+          <button class="btn btn-success" onclick="filterTable()"><i class="fas fa-search"></i></button>
+        </div>
+      </div>
+
       <div class="table-responsive">
         <table class="table table-bordered align-middle">
           <thead class="table-success">
@@ -125,8 +134,8 @@
           <td>${item.batchId}</td>
           <td>${item.transportId}</td>
           <td class="text-center">
-            <button class="edit-btn me-2" onclick="editPackaging(${index})">Edit</button>
-            <button class="delete-btn" onclick="deletePackaging(${index})">Delete</button>
+            <a href="edit_packaging.html?id=${index + 1}&type=${encodeURIComponent(item.type)}&weight=${encodeURIComponent(item.weight)}&date=${encodeURIComponent(item.date)}&batch=${encodeURIComponent(item.batchId)}&transport=${encodeURIComponent(item.transportId)}" class="btn btn-warning btn-sm me-2">Edit</a>
+            <button class="delete-btn btn btn-danger btn-sm" onclick="deletePackaging(${index})">Delete</button>
           </td>
         `;
         tableBody.appendChild(row);
@@ -170,6 +179,17 @@
       updateTable();
     }
 
+    function filterTable() {
+      const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+      const rows = tableBody.getElementsByTagName("tr");
+
+      for (let row of rows) {
+        const [id, type, weight, date, batchId, transportId] = row.children;
+        const text = `${type.textContent} ${batchId.textContent} ${transportId.textContent}`.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? "" : "none";
+      }
+    }
+
     let pieChart, barChart;
 
     function updateChart() {
@@ -180,9 +200,8 @@
         typeCounts[item.type] = (typeCounts[item.type] || 0) + 1;
 
         const date = new Date(item.date);
-        const month = date.getMonth();
-        const year = date.getFullYear();
         const monthName = date.toLocaleString('default', { month: 'long' });
+        const year = date.getFullYear();
         const monthLabel = `${monthName} ${year}`;
 
         monthlyTotals[monthLabel] = (monthlyTotals[monthLabel] || 0) + parseFloat(item.weight);

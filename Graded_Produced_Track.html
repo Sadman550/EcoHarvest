@@ -2,335 +2,265 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>EcoHarvest - Grading Tracking</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Eco Harvest - Packaging</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <style>
-    /* Nav & Button Hover/Active Effect */
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 20px;
-      padding: 0;
-    }
-
-    nav ul li a {
-      text-decoration: none;
-      color: white;
-      padding: 8px 15px;
-      font-weight: 500;
-      position: relative;
-      transition: all 0.3s ease;
-      border-radius: 50px;  /* Round indicator */
-    }
-
-    nav ul li a:hover,
-    nav ul li a.active {
-      background-color: rgba(40, 167, 69, 0.8);
-      color: #fff !important;
-      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
-      border-radius: 50px;  /* Keep the round effect on hover and active */
-    }
-
-    /* Reuse style for Add Button */
-    .btn-eco {
-      background-color: rgba(46, 139, 87, 0.9);
-      border: none;
-      transition: all 0.3s ease;
-    }
-
-    .btn-eco:hover {
-      background-color: #2e8b57;
-      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f0f4f1;
-      color: white;
-    }
-
-    header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background-color: rgba(46, 139, 87, 0.9);
-      padding: 20px 50px;
-      z-index: 1000;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: all 0.3s ease;
-    }
-
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-      color: white;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-    }
-
-    .hero {
-      padding: 200px 20px 100px;
-      background: url('image/backgraund.png') no-repeat center center/cover;
-      position: relative;
-      min-height: 100vh;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(0, 0, 0, 0.6);
-      z-index: 0;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 1000px;
-      margin: auto;
-    }
-
-    .form-title {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .form-control {
-      background-color: rgba(255, 255, 255, 0.9);
-      color: #000;
-    }
-
-    .form-section, .table-section {
-      background-color: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(6px);
-      padding: 25px;
-      border-radius: 10px;
-      margin-bottom: 40px;
-    }
-
-    .table thead th {
-      background-color: rgba(46, 139, 87, 0.6);
-      color: white;
-    }
-
-    .table tbody td {
-      background-color: rgba(255, 255, 255, 0.9);
-      color: black;
-    }
-
-    .footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 14px;
-      background-color: rgba(255, 255, 255, 0.05);
-      color: #ddd;
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .modal-content {
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      backdrop-filter: blur(5px);
-      border-radius: 10px;
-    }
-
-    @media (max-width: 768px) {
-      nav ul {
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="packaging_style.css">
 </head>
 <body>
 
-<header id="navbar">
-  <div class="logo d-flex align-items-center">
-    <img src="Logo/logo-transparent (2.1).PNG" style="height: 60px; width: auto; margin-right: 10px;">
-    <span>Eco Harvest</span>
-  </div>
-  <nav>
-    <ul>
-      <li><a href="Dashboard.html">Dashboard</a></li>
-      <li><a href="Quality_Report.html">Quality Report</a></li>
-      <li><a href="Quality_analysis.html">Quality Analysis</a></li>
-      <li><a href="Graded_Produced_Track.html" class = "active">Graded Produced</a></li>
-      <li><a href="packaging_tracking.html">Packaging</a></li>
-      <li><a href="Transportation.html">Transportation</a></li>
-      <li><a href="Supply_Chain.html">Supply Chain</a></li>
-      <li><a href="login.html">Logout</a></li>
-    </ul>
-  </nav>
-</header>
+  <!-- Header -->
+  <header>
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="navbar-brand d-flex align-items-center text-white fw-bold">
+        <img src="Logo/logo-transparent (2.1).PNG" alt="Logo" style="height: 60px; margin-right: 10px;">
+        <span class="fs-4">Eco Harvest</span> <!-- Added Eco Harvest text here -->
+      </div>
+      <nav>
+        <ul class="navbar-nav flex-row gap-3">
+          <li class="nav-item"><a href="Dashboard.html" class="nav-link">Dashboard</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Quality Report</a></li>
+          <li class="nav-item"><a href="Graded_Produced_Track.html" class="nav-link">Graded Produced</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Supply Chain</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Quality Analysis</a></li>
+          <li class="nav-item"><a href="packaging_tracking.html" class="nav-link active">Packaging</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Transportation</a></li>
+          <li class="nav-item"><a href="login.html" class="nav-link">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
 
-<section class="hero">
-  <div class="hero-content">
+  <!-- Main Content -->
+  <main class="container py-5">
 
-    <div class="form-section">
-      <h2 class="form-title">Add Graded Product</h2>
-      <form class="row g-3">
-        <div class="col-md-3">
-          <label for="grade" class="form-label">Grade</label>
-          <input type="text" class="form-control" id="grade" placeholder="e.g. Grade A">
+    <!-- Packaging Records Table -->
+    <div class="mt-4 bg-white bg-opacity-75 p-4 p-md-5 rounded-4 border border-success shadow-sm">
+      <h2 class="text-center text-success fw-bold mb-4">Packaging Records</h2>
+
+      <!-- Search Bar -->
+      <div class="d-flex justify-content-end mb-3">
+        <div class="input-group" style="max-width: 300px;">
+          <input type="text" id="searchInput" class="form-control border-success" placeholder="Search...">
+          <button class="btn btn-success" onclick="filterTable()"><i class="fas fa-search"></i></button>
         </div>
-        <div class="col-md-3">
-          <label for="product" class="form-label">Product</label>
-          <input type="text" class="form-control" id="product" placeholder="e.g. Mango">
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-success">
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Weight (kg)</th>
+              <th>Date</th>
+              <th>Batch ID</th>
+              <th>Transport ID</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Add Packaging Info Form -->
+    <div class="mt-5 bg-white bg-opacity-75 p-4 p-md-5 rounded-4 border border-success shadow-sm mx-auto" style="max-width: 800px;">
+      <h2 class="text-center text-success fw-bold mb-4">Add Packaging Info</h2>
+      <form id="packagingForm">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="packaging-type" class="form-label fw-semibold text-success">Packaging Type</label>
+            <input type="text" id="packaging-type" class="form-control border-success" placeholder="e.g. Eco Box" required>
+          </div>
+          <div class="col-md-6">
+            <label for="weight" class="form-label fw-semibold text-success">Weight (kg)</label>
+            <input type="number" step="0.01" id="weight" class="form-control border-success" placeholder="e.g. 2.5" required>
+          </div>
         </div>
-        <div class="col-md-3">
-          <label for="product-weight" class="form-label">Weight</label>
-          <input type="text" class="form-control" id="weight" placeholder="e.g. 2 kg">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="packaging-date" class="form-label fw-semibold text-success">Packaging Date</label>
+            <input type="date" id="packaging-date" class="form-control border-success" required>
+          </div>
+          <div class="col-md-6">
+            <label for="batch-id" class="form-label fw-semibold text-success">Batch ID</label>
+            <input type="text" id="batch-id" class="form-control border-success" placeholder="e.g. BATCH001" required>
+          </div>
         </div>
-        <div class="col-md-3">
-          <label for="track" class="form-label">Tracking Info</label>
-          <input type="text" class="form-control" id="track" placeholder="e.g. Farm ➝ Market">
+        <div class="mb-3">
+          <label for="transport-id" class="form-label fw-semibold text-success">Transport ID</label>
+          <input type="text" id="transport-id" class="form-control border-success" placeholder="e.g. TRANS100" required>
         </div>
-        <div class="col-md-12 text-center">
-          <button type="button" onclick="addRow()" class="btn btn-eco px-4 mt-3">Add</button>
+        <div class="text-center">
+          <button type="submit" class="btn btn-success px-4 py-2 fw-bold">
+            <i class="fas fa-plus-circle me-2"></i>Add Packaging Info
+          </button>
         </div>
       </form>
     </div>
 
-    <div class="table-section">
-      <h2 class="form-title">📋 Product Tracking Table</h2>
-      <table class="table table-bordered text-center" id="dataTable">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Grade</th>
-            <th>Product</th>
-            <th>Weight</th>
-            <th>Track</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
-
-  </div>
-</section>
-
-<!-- Modal -->
-<div class="modal fade" id="editModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header border-0">
-        <h5 class="modal-title">Edit Graded Product</h5>
-        <button type="button" class="btn-close bg-white" data-bs-dismiss="modal"></button>
+    <!-- Charts Section -->
+    <div class="charts-container mt-5">
+      <div class="chart-card col-md-6 col-lg-4">
+        <h3 class="text-center text-success fw-bold">Packaging by Type</h3>
+        <canvas id="packagingPieChart"></canvas>
       </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label for="editGrade" class="form-label">Grade</label>
-          <input type="text" id="editGrade" class="form-control" placeholder="Edit Grade">
-        </div>
-        <div class="mb-3">
-          <label for="editProduct" class="form-label">Product</label>
-          <input type="text" id="editProduct" class="form-control" placeholder="Edit Product">
-        </div>
-        <div class="mb-3">
-          <label for="editWeight" class="form-label">Weight (kg)</label>
-          <input type="text" id="editWeight" class="form-control" placeholder="Edit Weight (kg)">
-        </div>
-        <div class="mb-3">
-          <label for="editTrack" class="form-label">Tracking Info</label>
-          <input type="text" id="editTrack" class="form-control" placeholder="Edit Tracking Info">
-        </div>
-      </div>
-      <div class="modal-footer border-0">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-success" onclick="applyEdit()">Update</button>
+      <div class="chart-card col-md-6 col-lg-4">
+        <h3 class="text-center text-success fw-bold">Monthly Packaging Volume</h3>
+        <canvas id="packagingBarChart"></canvas>
       </div>
     </div>
-  </div>
-</div>
+  </main>
 
-<footer class="footer">
-  &copy; 2025 EcoHarvest. All rights reserved.
-</footer>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    let packagingInfo = [];
+    let currentEditIndex = -1;
 
-<script>
-  let count = 1;
-  let currentRow = null;
+    const packagingForm = document.getElementById("packagingForm");
+    const tableBody = document.getElementById("tableBody");
 
-  function addRow() {
-    const grade = document.getElementById('grade').value.trim();
-    const product = document.getElementById('product').value.trim();
-    const weight = document.getElementById('weight').value.trim();
-    const track = document.getElementById('track').value.trim();
-
-    if (!grade || !product || !weight || !track) {
-      alert("Please fill all fields!");
-      return;
+    function updateTable() {
+      tableBody.innerHTML = "";
+      packagingInfo.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${item.type}</td>
+          <td>${item.weight}</td>
+          <td>${item.date}</td>
+          <td>${item.batchId}</td>
+          <td>${item.transportId}</td>
+          <td class="text-center">
+            <a href="edit_packaging.html?id=${index + 1}&type=${encodeURIComponent(item.type)}&weight=${encodeURIComponent(item.weight)}&date=${encodeURIComponent(item.date)}&batch=${encodeURIComponent(item.batchId)}&transport=${encodeURIComponent(item.transportId)}" class="btn btn-warning btn-sm me-2">Edit</a>
+            <button class="delete-btn btn btn-danger btn-sm" onclick="deletePackaging(${index})">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+      updateChart();
     }
 
-    const table = document.getElementById("tableBody");
-    const row = table.insertRow();
-    row.innerHTML = `
-      <td>${count++}</td>
-      <td>${grade}</td>
-      <td>${product}</td>
-      <td>${weight}</td>
-      <td>${track}</td>
-      <td>
-        <button class="btn btn-warning" onclick="editRow(this)">Edit</button>
-        <button class="btn btn-danger" onclick="deleteRow(this)">Delete</button>
-      </td>
-    `;
+    function addPackagingInfo(event) {
+      event.preventDefault();
+      const newPackaging = {
+        type: document.getElementById("packaging-type").value,
+        weight: document.getElementById("weight").value,
+        date: document.getElementById("packaging-date").value,
+        batchId: document.getElementById("batch-id").value,
+        transportId: document.getElementById("transport-id").value,
+      };
 
-    document.getElementById('grade').value = '';
-    document.getElementById('product').value = '';
-    document.getElementById('weight').value = '';
-    document.getElementById('track').value = '';
-  }
+      if (currentEditIndex !== -1) {
+        packagingInfo[currentEditIndex] = newPackaging;
+        currentEditIndex = -1;
+      } else {
+        packagingInfo.push(newPackaging);
+      }
 
-  function editRow(button) {
-    const row = button.parentElement.parentElement;
-    currentRow = row;
-
-    document.getElementById('editGrade').value = row.cells[1].textContent;
-    document.getElementById('editProduct').value = row.cells[2].textContent;
-    document.getElementById('editWeight').value = row.cells[3].textContent;
-    document.getElementById('editTrack').value = row.cells[4].textContent;
-
-    const modal = new bootstrap.Modal(document.getElementById('editModal'));
-    modal.show();
-  }
-
-  function applyEdit() {
-    const grade = document.getElementById('editGrade').value.trim();
-    const product = document.getElementById('editProduct').value.trim();
-    const weight = document.getElementById('editWeight').value.trim();
-    const track = document.getElementById('editTrack').value.trim();
-
-    if (!grade || !product || !weight || !track) {
-      alert("Please fill all fields!");
-      return;
+      packagingForm.reset();
+      updateTable();
     }
 
-    currentRow.cells[1].textContent = grade;
-    currentRow.cells[2].textContent = product;
-    currentRow.cells[3].textContent = weight;
-    currentRow.cells[4].textContent = track;
+    function editPackaging(index) {
+      const item = packagingInfo[index];
+      document.getElementById("packaging-type").value = item.type;
+      document.getElementById("weight").value = item.weight;
+      document.getElementById("packaging-date").value = item.date;
+      document.getElementById("batch-id").value = item.batchId;
+      document.getElementById("transport-id").value = item.transportId;
+      currentEditIndex = index;
+    }
 
-    const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-    modal.hide();
-  }
+    function deletePackaging(index) {
+      packagingInfo.splice(index, 1);
+      updateTable();
+    }
 
-  function deleteRow(button) {
-    const row = button.parentElement.parentElement;
-    row.remove();
-  }
-</script>
+    function filterTable() {
+      const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+      const rows = tableBody.getElementsByTagName("tr");
 
+      for (let row of rows) {
+        const [id, type, weight, date, batchId, transportId] = row.children;
+        const text = `${type.textContent} ${batchId.textContent} ${transportId.textContent}`.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? "" : "none";
+      }
+    }
+
+    let pieChart, barChart;
+
+    function updateChart() {
+      const typeCounts = {};
+      const monthlyTotals = {};
+
+      packagingInfo.forEach(item => {
+        typeCounts[item.type] = (typeCounts[item.type] || 0) + 1;
+
+        const date = new Date(item.date);
+        const monthName = date.toLocaleString('default', { month: 'long' });
+        const year = date.getFullYear();
+        const monthLabel = `${monthName} ${year}`;
+
+        monthlyTotals[monthLabel] = (monthlyTotals[monthLabel] || 0) + parseFloat(item.weight);
+      });
+
+      const pieLabels = Object.keys(typeCounts);
+      const pieData = Object.values(typeCounts);
+
+      const barLabels = Object.keys(monthlyTotals).sort();
+      const barData = barLabels.map(label => monthlyTotals[label]);
+
+      if (pieChart) pieChart.destroy();
+      pieChart = new Chart(document.getElementById("packagingPieChart"), {
+        type: 'pie',
+        data: {
+          labels: pieLabels,
+          datasets: [{
+            data: pieData,
+            backgroundColor: ["#28a745", "#20c997", "#4dbd74", "#6ccf8f", "#2eb85c"],
+            borderColor: "#fff",
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: "bottom" } }
+        }
+      });
+
+      if (barChart) barChart.destroy();
+      barChart = new Chart(document.getElementById("packagingBarChart"), {
+        type: 'bar',
+        data: {
+          labels: barLabels,
+          datasets: [{
+            label: "Total Weight (kg)",
+            data: barData,
+            backgroundColor: "#218838",
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 5 }
+            }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    packagingForm.addEventListener("submit", addPackagingInfo);
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
