@@ -1,92 +1,111 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Green Harvest</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css">
+  <title>Eco Harvest - Packaging</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="packaging_style.css">
 </head>
-<body class="min-h-screen">
+<body>
 
-  <header id="navbar">
-    <div class="logo d-flex align-items-center">
-      <span>Eco Harvest</span>
+  <!-- Header -->
+  <header>
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="navbar-brand d-flex align-items-center text-white fw-bold">
+        <img src="Logo/logo-transparent (2.1).PNG" alt="Logo">
+        Eco Harvest
+      </div>
+      <nav>
+        <ul class="navbar-nav flex-row gap-3">
+          <li class="nav-item"><a href="Dashboard.html" class="nav-link">Dashboard</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Quality Report</a></li>
+          <li class="nav-item"><a href="Graded_Produced_Track.html" class="nav-link">Graded Produced</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Supply Chain</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Quality Analysis</a></li>
+          <li class="nav-item"><a href="packaging_tracking.html" class="nav-link active">Packaging</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Transportation</a></li>
+          <li class="nav-item"><a href="login.html" class="nav-link">Logout</a></li>
+        </ul>
+      </nav>
     </div>
-    <nav>
-      <ul>
-        <li><a href="Dashboard.html">Dashboard</a></li>
-        <li><a href="#">Quality Report</a></li>
-        <li><a href="Graded_Produced_Track.html">Graded Produced</a></li>
-        <li><a href="#">Supply Chain</a></li>
-        <li><a href="#">Quality Analysis</a></li>
-        <li><a href="packaging_tracking.html" class="active">Packaging</a></li>
-        <li><a href="#">Transportation</a></li>
-        <li><a href="login.html">Logout</a></li>
-      </ul>
-    </nav>
   </header>
 
-  <section class="pt-28 pb-16 px-6 md:px-12 max-w-7xl mx-auto">
+  <!-- Main Content -->
+  <main class="container py-5">
 
-    <div class="mt-16 max-w-6xl mx-auto rounded-3xl shadow-lg border border-green-300 p-6 md:p-10">
-      <h2 class="text-3xl font-extrabold text-green-800 mb-8 text-center drop-shadow-md">Packaging Records</h2>
-      <div class="overflow-x-auto scrollbar-thin rounded-lg">
-        <table class="min-w-full border-collapse text-left">
-          <thead class="bg-green-600 bg-opacity-90 text-white text-sm md:text-base rounded-t-lg">
+    <!-- Packaging Records Table -->
+    <div class="mt-4 bg-white bg-opacity-75 p-4 p-md-5 rounded-4 border border-success shadow-sm">
+      <h2 class="text-center text-success fw-bold mb-4">Packaging Records</h2>
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-success">
             <tr>
-              <th class="py-3 px-4 font-semibold">ID</th>
-              <th class="py-3 px-4 font-semibold">Type</th>
-              <th class="py-3 px-4 font-semibold">Weight (kg)</th>
-              <th class="py-3 px-4 font-semibold">Date</th>
-              <th class="py-3 px-4 font-semibold">Batch ID</th>
-              <th class="py-3 px-4 font-semibold">Transport ID</th>
-              <th class="py-3 px-4 font-semibold text-center">Actions</th>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Weight (kg)</th>
+              <th>Date</th>
+              <th>Batch ID</th>
+              <th>Transport ID</th>
+              <th class="text-center">Actions</th>
             </tr>
           </thead>
-          <tbody id="tableBody" class="text-green-900 text-sm md:text-base divide-y divide-green-200">
-          </tbody>
+          <tbody id="tableBody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Add mt-16 below to add spacing -->
-    <div class="rounded-3xl max-w-4xl mx-auto mt-16 p-8 md:p-12 border border-green-300">
-      <h2 class="text-3xl font-extrabold text-green-800 mb-8 text-center drop-shadow-md">Add Packaging Info</h2>
-      <form id="packagingForm" class="space-y-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label for="packaging-type" class="block text-green-900 font-semibold mb-2">Packaging Type</label>
-            <input type="text" id="packaging-type" required placeholder="e.g. Eco Box" class="w-full rounded-lg border border-green-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition" />
+    <!-- Add Packaging Info Form -->
+    <div class="mt-5 bg-white bg-opacity-75 p-4 p-md-5 rounded-4 border border-success shadow-sm mx-auto" style="max-width: 800px;">
+      <h2 class="text-center text-success fw-bold mb-4">Add Packaging Info</h2>
+      <form id="packagingForm">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="packaging-type" class="form-label fw-semibold text-success">Packaging Type</label>
+            <input type="text" id="packaging-type" class="form-control border-success" placeholder="e.g. Eco Box" required>
           </div>
-          <div>
-            <label for="weight" class="block text-green-900 font-semibold mb-2">Weight (kg)</label>
-            <input type="number" id="weight" step="0.01" required placeholder="e.g. 2.5" class="w-full rounded-lg border border-green-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition" />
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label for="packaging-date" class="block text-green-900 font-semibold mb-2">Packaging Date</label>
-            <input type="date" id="packaging-date" required class="w-full rounded-lg border border-green-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition" />
-          </div>
-          <div>
-            <label for="batch-id" class="block text-green-900 font-semibold mb-2">Batch ID</label>
-            <input type="text" id="batch-id" required placeholder="e.g. BATCH001" class="w-full rounded-lg border border-green-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition" />
+          <div class="col-md-6">
+            <label for="weight" class="form-label fw-semibold text-success">Weight (kg)</label>
+            <input type="number" step="0.01" id="weight" class="form-control border-success" placeholder="e.g. 2.5" required>
           </div>
         </div>
-        <div>
-          <label for="transport-id" class="block text-green-900 font-semibold mb-2">Transport ID</label>
-          <input type="text" id="transport-id" required placeholder="e.g. TRANS100" class="w-full rounded-lg border border-green-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition" />
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="packaging-date" class="form-label fw-semibold text-success">Packaging Date</label>
+            <input type="date" id="packaging-date" class="form-control border-success" required>
+          </div>
+          <div class="col-md-6">
+            <label for="batch-id" class="form-label fw-semibold text-success">Batch ID</label>
+            <input type="text" id="batch-id" class="form-control border-success" placeholder="e.g. BATCH001" required>
+          </div>
         </div>
-        <button type="submit" class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition flex items-center justify-center gap-2">
-          <i class="fas fa-plus-circle"></i> Add Packaging Info
-        </button>
+        <div class="mb-3">
+          <label for="transport-id" class="form-label fw-semibold text-success">Transport ID</label>
+          <input type="text" id="transport-id" class="form-control border-success" placeholder="e.g. TRANS100" required>
+        </div>
+        <div class="text-center">
+          <button type="submit" class="btn btn-success px-4 py-2 fw-bold">
+            <i class="fas fa-plus-circle me-2"></i>Add Packaging Info
+          </button>
+        </div>
       </form>
     </div>
-  </section>
 
+    <!-- Charts Section -->
+    <div class="charts-container mt-5">
+      <div class="chart-card col-md-6 col-lg-4">
+        <h3 class="text-center text-success fw-bold">Packaging by Type</h3>
+        <canvas id="packagingPieChart"></canvas>
+      </div>
+      <div class="chart-card col-md-6 col-lg-4">
+        <h3 class="text-center text-success fw-bold">Monthly Packaging Volume</h3>
+        <canvas id="packagingBarChart"></canvas>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     let packagingInfo = [];
     let currentEditIndex = -1;
@@ -99,24 +118,24 @@
       packagingInfo.forEach((item, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td class="py-3 px-4">${index + 1}</td>
-          <td class="py-3 px-4">${item.type}</td>
-          <td class="py-3 px-4">${item.weight}</td>
-          <td class="py-3 px-4">${item.date}</td>
-          <td class="py-3 px-4">${item.batchId}</td>
-          <td class="py-3 px-4">${item.transportId}</td>
-          <td class="py-3 px-4 text-center">
-            <button class="edit-btn" onclick="editPackaging(${index})">Edit</button>
+          <td>${index + 1}</td>
+          <td>${item.type}</td>
+          <td>${item.weight}</td>
+          <td>${item.date}</td>
+          <td>${item.batchId}</td>
+          <td>${item.transportId}</td>
+          <td class="text-center">
+            <button class="edit-btn me-2" onclick="editPackaging(${index})">Edit</button>
             <button class="delete-btn" onclick="deletePackaging(${index})">Delete</button>
           </td>
         `;
         tableBody.appendChild(row);
       });
+      updateChart();
     }
 
     function addPackagingInfo(event) {
       event.preventDefault();
-
       const newPackaging = {
         type: document.getElementById("packaging-type").value,
         weight: document.getElementById("weight").value,
@@ -132,7 +151,7 @@
         packagingInfo.push(newPackaging);
       }
 
-      document.getElementById("packagingForm").reset();
+      packagingForm.reset();
       updateTable();
     }
 
@@ -143,7 +162,6 @@
       document.getElementById("packaging-date").value = item.date;
       document.getElementById("batch-id").value = item.batchId;
       document.getElementById("transport-id").value = item.transportId;
-
       currentEditIndex = index;
     }
 
@@ -152,7 +170,78 @@
       updateTable();
     }
 
+    let pieChart, barChart;
+
+    function updateChart() {
+      const typeCounts = {};
+      const monthlyTotals = {};
+
+      packagingInfo.forEach(item => {
+        typeCounts[item.type] = (typeCounts[item.type] || 0) + 1;
+
+        const date = new Date(item.date);
+        const month = date.getMonth();
+        const year = date.getFullYear();
+        const monthName = date.toLocaleString('default', { month: 'long' });
+        const monthLabel = `${monthName} ${year}`;
+
+        monthlyTotals[monthLabel] = (monthlyTotals[monthLabel] || 0) + parseFloat(item.weight);
+      });
+
+      const pieLabels = Object.keys(typeCounts);
+      const pieData = Object.values(typeCounts);
+
+      const barLabels = Object.keys(monthlyTotals).sort();
+      const barData = barLabels.map(label => monthlyTotals[label]);
+
+      if (pieChart) pieChart.destroy();
+      pieChart = new Chart(document.getElementById("packagingPieChart"), {
+        type: 'pie',
+        data: {
+          labels: pieLabels,
+          datasets: [{
+            data: pieData,
+            backgroundColor: ["#28a745", "#20c997", "#4dbd74", "#6ccf8f", "#2eb85c"],
+            borderColor: "#fff",
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: "bottom" } }
+        }
+      });
+
+      if (barChart) barChart.destroy();
+      barChart = new Chart(document.getElementById("packagingBarChart"), {
+        type: 'bar',
+        data: {
+          labels: barLabels,
+          datasets: [{
+            label: "Total Weight (kg)",
+            data: barData,
+            backgroundColor: "#218838",
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 5 }
+            }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
     packagingForm.addEventListener("submit", addPackagingInfo);
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
