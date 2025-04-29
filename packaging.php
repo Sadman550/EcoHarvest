@@ -23,6 +23,25 @@ if ($result) {
 
 // Handle form submissions
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // AJAX Delete Handler
+    if (isset($_POST['delete_id']) && isset($_POST['ajax'])) {
+        header('Content-Type: application/json');
+        $delete_id = filter_input(INPUT_POST, 'delete_id', FILTER_SANITIZE_NUMBER_INT);
+        $stmt = $conn->prepare("DELETE FROM packaging WHERE id = ?");
+        if ($stmt) {
+            $stmt->bind_param("i", $delete_id);
+            if ($stmt->execute()) {
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'error' => $conn->error]);
+            }
+            $stmt->close();
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Statement preparation failed']);
+        }
+        exit();
+    }
+
     if (isset($_POST['action'])) {
         $type = filter_input(INPUT_POST, 'packaging-type', FILTER_SANITIZE_STRING);
         $weight = filter_input(INPUT_POST, 'weight', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
@@ -94,6 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['notification_class'] = "alert-danger";
         }
     } elseif (isset($_POST['delete_id'])) {
+        // Fallback for non-AJAX deletion (kept for compatibility)
         $delete_id = filter_input(INPUT_POST, 'delete_id', FILTER_SANITIZE_NUMBER_INT);
         $stmt = $conn->prepare("DELETE FROM packaging WHERE id = ?");
         if ($stmt) {
@@ -112,7 +132,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Refresh packagingInfo after modification
+    // Refresh packagingInfo after modification (for non-AJAX requests)
     $packagingInfo = [];
     $result = $conn->query("SELECT * FROM packaging ORDER BY id DESC");
     if ($result) {
@@ -128,12 +148,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Redirect to prevent form resubmission on refresh
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit();
+    // Redirect for non-AJAX requests
+    if (!isset($_POST['ajax'])) {
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    }
 }
 
-// Prepare data for charts
+// Prepare data for charts (initial load)
 $typeCounts = [];
 $monthlyTotals = [];
 foreach ($packagingInfo as $item) {
@@ -939,31 +961,10 @@ header.scrolled {
     </div>
   </div>
 
-  <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title" id="deleteConfirmModalLabel"><i class="fas fa-exclamation-circle me-2"></i>Confirm Deletion</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to delete this packaging record? This action cannot be undone.</p>
-        </div>
-        <div class="modal-footer">
-          <form method="POST" action="">
-            <input type="hidden" name="delete_id" id="deleteId">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-danger" id="confirmDeleteBtn">Delete Record</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    const packagingInfo = <?php echo json_encode($packagingInfo); ?>;
+    let packagingInfo = <?php echo json_encode($packagingInfo); ?>;
     let currentPage = <?php echo $currentPage; ?>;
     const recordsPerPage = <?php echo $recordsPerPage; ?>;
     let debounceTimeout;
@@ -1009,9 +1010,25 @@ header.scrolled {
     }
 
     function confirmDelete(id) {
-      document.getElementById('deleteId').value = id;
-      const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-      modal.show();
+      if (confirm('Are you sure you want to delete this record? This action cannot be undone.')) {
+        fetch('<?php echo $_SERVER['PHP_SELF']; ?>', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `delete_id=${id}&ajax=1`
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Packaging record deleted successfully!', true);
+            packagingInfo = packagingInfo.filter(item => item.id != id);
+            updateTable();
+            updateCharts();
+          } else {
+            showNotification('Error deleting record: ' + data.error, false);
+          }
+        })
+        .catch(error => showNotification('Error: ' + error, false));
+      }
     }
 
     function filterTable() {
@@ -1068,6 +1085,19 @@ header.scrolled {
     let pieChart, barChart;
 
     function updateCharts() {
+      const typeCounts = {};
+      const monthlyTotals = {};
+      packagingInfo.forEach(item => {
+        typeCounts[item.type] = (typeCounts[item.type] || 0) + 1;
+        const date = new Date(item.date);
+        const monthLabel = date.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+        monthlyTotals[monthLabel] = (monthlyTotals[monthLabel] || 0) + parseFloat(item.weight);
+      });
+      const pieLabels = Object.keys(typeCounts).length ? Object.keys(typeCounts) : ['No Data'];
+      const pieData = Object.keys(typeCounts).length ? Object.values(typeCounts) : [1];
+      const barLabels = Object.keys(monthlyTotals).length ? Object.keys(monthlyTotals) : ['No Data'];
+      const barData = Object.keys(monthlyTotals).length ? Object.values(monthlyTotals) : [0];
+
       const chartColors = {
         'Square': '#FF90BB',
         'Eco Box': '#3D365C',
@@ -1080,12 +1110,7 @@ header.scrolled {
         'No Data': '#ccc'
       };
 
-      const pieLabels = <?php echo json_encode($pieLabels); ?>;
-      const pieData = <?php echo json_encode($pieData); ?>;
       const pieBackgroundColors = pieLabels.map(label => chartColors[label] || '#ccc');
-
-      const barLabels = <?php echo json_encode($barLabels); ?>;
-      const barData = <?php echo json_encode($barData); ?>;
       const barBackgroundColors = barLabels.map((_, i) => Object.values(chartColors)[i % (Object.keys(chartColors).length - 1)]);
 
       if (pieChart) pieChart.destroy();
