@@ -1,3 +1,158 @@
+<?php
+session_start();
+$conn = new mysqli("localhost", "root", "", "ecoharvest");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$packagingInfo = [];
+
+$result = $conn->query("SELECT * FROM packaging ORDER BY id DESC");
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $packagingInfo[] = [
+            'id' => $row['id'],
+            'type' => $row['type'],
+            'weight' => $row['weight'],
+            'date' => $row['date'],
+            'batchId' => $row['batch_id'],
+            'transportId' => $row['transport_id']
+        ];
+    }
+}
+
+// Handle form submissions
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['action'])) {
+        $type = filter_input(INPUT_POST, 'packaging-type', FILTER_SANITIZE_STRING);
+        $weight = filter_input(INPUT_POST, 'weight', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        $date = filter_input(INPUT_POST, 'packaging-date', FILTER_SANITIZE_STRING);
+        $batch_id = filter_input(INPUT_POST, 'batch-id', FILTER_SANITIZE_STRING);
+        $transport_id = filter_input(INPUT_POST, 'transport-id', FILTER_SANITIZE_STRING);
+
+        // Validate inputs
+        $errors = [];
+        if (empty($type)) $errors[] = "Packaging type is required.";
+        if (!is_numeric($weight) || $weight <= 0 || $weight > 10000) $errors[] = "Weight must be between 0.01 and 10000 kg.";
+        if (empty($date) || strtotime($date) > time()) $errors[] = "Invalid date or date cannot be in the future.";
+        if (empty($batch_id) || !preg_match("/^[0-9]+$/", $batch_id)) $errors[] = "Batch ID must be numeric.";
+        if (empty($transport_id) || !preg_match("/^[0-9]+$/", $transport_id)) $errors[] = "Transport ID must be numeric.";
+
+        $batch_id_full = "BATCH$batch_id";
+        $transport_id_full = "TRANS$transport_id";
+
+        // Check for duplicate batch_id or transport_id
+        $stmt = $conn->prepare("SELECT id FROM packaging WHERE (batch_id = ? OR transport_id = ?) AND id != ?");
+        if ($stmt) {
+            $edit_id = isset($_POST['edit_id']) ? intval($_POST['edit_id']) : 0;
+            $stmt->bind_param("ssi", $batch_id_full, $transport_id_full, $edit_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->num_rows > 0) {
+                $errors[] = "Batch ID or Transport ID already exists.";
+            }
+            $stmt->close();
+        }
+
+        if (empty($errors)) {
+            if ($_POST['action'] == 'add') {
+                $stmt = $conn->prepare("INSERT INTO packaging (type, weight, date, batch_id, transport_id) VALUES (?, ?, ?, ?, ?)");
+                if ($stmt) {
+                    $stmt->bind_param("sdsss", $type, $weight, $date, $batch_id_full, $transport_id_full);
+                    if ($stmt->execute()) {
+                        $_SESSION['notification'] = "New packaging record added successfully!";
+                        $_SESSION['notification_class'] = "alert-success";
+                    } else {
+                        $_SESSION['notification'] = "Error adding record: " . $conn->error;
+                        $_SESSION['notification_class'] = "alert-danger";
+                    }
+                    $stmt->close();
+                } else {
+                    $_SESSION['notification'] = "Error preparing statement.";
+                    $_SESSION['notification_class'] = "alert-danger";
+                }
+            } elseif ($_POST['action'] == 'edit' && isset($_POST['edit_id'])) {
+                $edit_id = filter_input(INPUT_POST, 'edit_id', FILTER_SANITIZE_NUMBER_INT);
+                $stmt = $conn->prepare("UPDATE packaging SET type = ?, weight = ?, date = ?, batch_id = ?, transport_id = ? WHERE id = ?");
+                if ($stmt) {
+                    $stmt->bind_param("sdsssi", $type, $weight, $date, $batch_id_full, $transport_id_full, $edit_id);
+                    if ($stmt->execute()) {
+                        $_SESSION['notification'] = "Packaging record updated successfully!";
+                        $_SESSION['notification_class'] = "alert-success";
+                    } else {
+                        $_SESSION['notification'] = "Error updating record: " . $conn->error;
+                        $_SESSION['notification_class'] = "alert-danger";
+                    }
+                    $stmt->close();
+                } else {
+                    $_SESSION['notification'] = "Error preparing statement.";
+                    $_SESSION['notification_class'] = "alert-danger";
+                }
+            }
+        } else {
+            $_SESSION['notification'] = implode(" ", $errors);
+            $_SESSION['notification_class'] = "alert-danger";
+        }
+    } elseif (isset($_POST['delete_id'])) {
+        $delete_id = filter_input(INPUT_POST, 'delete_id', FILTER_SANITIZE_NUMBER_INT);
+        $stmt = $conn->prepare("DELETE FROM packaging WHERE id = ?");
+        if ($stmt) {
+            $stmt->bind_param("i", $delete_id);
+            if ($stmt->execute()) {
+                $_SESSION['notification'] = "Packaging record deleted successfully!";
+                $_SESSION['notification_class'] = "alert-success";
+            } else {
+                $_SESSION['notification'] = "Error deleting record: " . $conn->error;
+                $_SESSION['notification_class'] = "alert-danger";
+            }
+            $stmt->close();
+        } else {
+            $_SESSION['notification'] = "Error preparing statement.";
+            $_SESSION['notification_class'] = "alert-danger";
+        }
+    }
+
+    // Refresh packagingInfo after modification
+    $packagingInfo = [];
+    $result = $conn->query("SELECT * FROM packaging ORDER BY id DESC");
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $packagingInfo[] = [
+                'id' => $row['id'],
+                'type' => $row['type'],
+                'weight' => $row['weight'],
+                'date' => $row['date'],
+                'batchId' => $row['batch_id'],
+                'transportId' => $row['transport_id']
+            ];
+        }
+    }
+
+    // Redirect to prevent form resubmission on refresh
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
+
+// Prepare data for charts
+$typeCounts = [];
+$monthlyTotals = [];
+foreach ($packagingInfo as $item) {
+    $typeCounts[$item['type']] = ($typeCounts[$item['type']] ?? 0) + 1;
+    $date = new DateTime($item['date']);
+    $monthLabel = $date->format('M Y');
+    $monthlyTotals[$monthLabel] = ($monthlyTotals[$monthLabel] ?? 0) + floatval($item['weight']);
+}
+$pieLabels = !empty($typeCounts) ? array_keys($typeCounts) : ['No Data'];
+$pieData = !empty($typeCounts) ? array_values($typeCounts) : [1];
+$barLabels = !empty($monthlyTotals) ? array_keys($monthlyTotals) : ['No Data'];
+$barData = !empty($monthlyTotals) ? array_values($monthlyTotals) : [0];
+
+// Clear notification after it will be displayed
+$notification = isset($_SESSION['notification']) ? $_SESSION['notification'] : '';
+$notification_class = isset($_SESSION['notification_class']) ? $_SESSION['notification_class'] : '';
+unset($_SESSION['notification'], $_SESSION['notification_class']);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -352,7 +507,7 @@ header.scrolled {
 .modal-title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: white; /* Explicitly set to prevent override */
+    color: white;
 }
 
 .modal-body {
@@ -430,7 +585,7 @@ header.scrolled {
 }
 
 .records-header {
-    background-color: rgba(46, 139, 87, 0.05); /* Added for better contrast */
+    background-color: rgba(46, 139, 87, 0.05);
     padding: 10px;
     border-radius: 8px;
 }
@@ -591,29 +746,31 @@ header.scrolled {
   <header id="mainHeader">
     <div class="d-flex justify-content-between align-items-center">
       <div class="navbar-brand d-flex align-items-center text-white">
-        <img src="images/logo.png" alt="Eco Harvest Logo" style="height: 60px; margin-right: 10px;">
+        <img src="images/logo.PNG" alt="Eco Harvest Logo" style="height: 60px; margin-right: 10px;" onerror="this.src='https://via.placeholder.com/60';">
         <span>Eco Harvest</span>
       </div>
       <nav>
         <ul class="navbar-nav flex-row">
-          <li class="nav-item"><a href="Dashboard.html" class="nav-link"><i class="fas fa-home me-1"></i> Dashboard</a></li>
+          <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-home me-1"></i> Dashboard</a></li>
           <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-clipboard-check me-1"></i> Quality Report</a></li>
-          <li class="nav-item"><a href="Graded_Produced_Track.html" class="nav-link"><i class="fas fa-seedling me-1"></i> Graded Produced</a></li>
+          <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-seedling me-1"></i> Graded Produced</a></li>
           <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-truck me-1"></i> Supply Chain</a></li>
           <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-chart-line me-1"></i> Quality Analysis</a></li>
-          <li class="nav-item"><a href="packaging_tracking.html" class="nav-link active"><i class="fas fa-box-open me-1"></i> Packaging</a></li>
+          <li class="nav-item"><a href="#" class="nav-link active"><i class="fas fa-box-open me-1"></i> Packaging</a></li>
           <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-shipping-fast me-1"></i> Transportation</a></li>
-          <li class="nav-item"><a href="login.html" class="nav-link"><i class="fas fa-sign-out-alt me-1"></i> Logout</a></li>
+          <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-sign-out-alt me-1"></i> Logout</a></li>
         </ul>
       </nav>
     </div>
   </header>
 
-  <div class="notification alert alert-success" role="alert" style="display: none;">
-    <i class="fas fa-check-circle me-2"></i>
-    <span id="notificationText">Operation completed successfully!</span>
+  <?php if ($notification): ?>
+  <div class="notification alert <?php echo htmlspecialchars($notification_class); ?>" role="alert">
+    <i class="fas fa-<?php echo $notification_class == 'alert-success' ? 'check-circle' : 'exclamation-circle'; ?> me-2"></i>
+    <span id="notificationText"><?php echo htmlspecialchars($notification); ?></span>
     <button type="button" class="btn-close ms-3" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
+  <?php endif; ?>
 
   <main class="container py-4">
     <div class="text-center mb-5">
@@ -629,7 +786,7 @@ header.scrolled {
         
         <div class="d-flex flex-column text-center records-header">
           <h2 class="records-title"><i class="fas fa-box-open me-2"></i>Packaging Records</h2>
-          <small class="records-count">Total Records: <span id="totalRecords">0</span></small>
+          <small class="records-count">Total Records: <span id="totalRecords"><?php echo count($packagingInfo); ?></span></small>
         </div>
         
         <div class="search-container">
@@ -651,12 +808,56 @@ header.scrolled {
               <th scope="col" class="text-center">Actions</th>
             </tr>
           </thead>
-          <tbody id="tableBody"></tbody>
+          <tbody id="tableBody">
+            <?php
+            $recordsPerPage = 10;
+            $currentPage = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+            $start = ($currentPage - 1) * $recordsPerPage;
+            $paginatedItems = array_slice($packagingInfo, $start, $recordsPerPage);
+
+            foreach ($paginatedItems as $index => $item):
+            ?>
+            <tr class="animate__animated animate__fadeIn" style="animation-delay: <?php echo ($index * 0.05); ?>s;">
+              <td><?php echo htmlspecialchars($item['id']); ?></td>
+              <td><i class="fas fa-box me-2"></i><?php echo htmlspecialchars($item['type']); ?></td>
+              <td><?php echo number_format($item['weight'], 2); ?> kg</td>
+              <td><?php echo (new DateTime($item['date']))->format('M d, Y'); ?></td>
+              <td><span class="badge bg-light text-dark"><?php echo htmlspecialchars($item['batchId']); ?></span></td>
+              <td><span class="badge bg-light text-dark"><?php echo htmlspecialchars($item['transportId']); ?></span></td>
+              <td class="text-center action-buttons">
+                <button class="btn btn-warning btn-sm me-2" onclick="editPackaging(<?php echo $item['id']; ?>)" aria-label="Edit record <?php echo $item['id']; ?>">
+                  <i class="fas fa-edit me-1"></i>Edit
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="confirmDelete(<?php echo $item['id']; ?>)" aria-label="Delete record <?php echo $item['id']; ?>">
+                  <i class="fas fa-trash-alt me-1"></i>Delete
+                </button>
+              </td>
+            </tr>
+            <?php endforeach; ?>
+            <?php if (empty($paginatedItems)): ?>
+            <tr><td colspan="7" class="text-center">No records found.</td></tr>
+            <?php endif; ?>
+          </tbody>
         </table>
       </div>
       
       <nav aria-label="Table pagination" class="mt-4">
-        <ul class="pagination justify-content-center" id="pagination"></ul>
+        <ul class="pagination justify-content-center">
+          <?php
+          $pageCount = ceil(count($packagingInfo) / $recordsPerPage);
+          ?>
+          <li class="page-item <?php echo $currentPage == 1 ? 'disabled' : ''; ?>">
+            <a class="page-link" href="?page=<?php echo $currentPage - 1; ?>" aria-label="Previous page">Previous</a>
+          </li>
+          <?php for ($i = 1; $i <= $pageCount; $i++): ?>
+          <li class="page-item <?php echo $i == $currentPage ? 'active' : ''; ?>">
+            <a class="page-link" href="?page=<?php echo $i; ?>" aria-label="Page <?php echo $i; ?>"><?php echo $i; ?></a>
+          </li>
+          <?php endfor; ?>
+          <li class="page-item <?php echo $currentPage == $pageCount ? 'disabled' : ''; ?>">
+            <a class="page-link" href="?page=<?php echo $currentPage + 1; ?>" aria-label="Next page">Next</a>
+          </li>
+        </ul>
       </nav>
     </div>
 
@@ -680,11 +881,13 @@ header.scrolled {
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="packagingForm">
+          <form id="packagingForm" method="POST" action="">
+            <input type="hidden" name="action" id="formAction" value="add">
+            <input type="hidden" name="edit_id" id="editId">
             <div class="row mb-3">
               <div class="col-md-6 mb-3 mb-md-0">
                 <label for="packaging-type" class="form-label">Packaging Type</label>
-                <select id="packaging-type" class="form-select" required>
+                <select id="packaging-type" name="packaging-type" class="form-select" required>
                   <option value="" selected disabled>Select type</option>
                   <option value="Square">Square</option>
                   <option value="Eco Box">Eco Box</option>
@@ -699,7 +902,7 @@ header.scrolled {
               <div class="col-md-6">
                 <label for="weight" class="form-label">Weight (kg)</label>
                 <div class="input-group">
-                  <input type="number" step="0.01" min="0.01" id="weight" class="form-control" placeholder="e.g. 2.5" required aria-describedby="weightUnit">
+                  <input type="number" step="0.01" min="0.01" id="weight" name="weight" class="form-control" placeholder="e.g. 2.5" required aria-describedby="weightUnit">
                   <span class="input-group-text" id="weightUnit">kg</span>
                 </div>
               </div>
@@ -707,13 +910,13 @@ header.scrolled {
             <div class="row mb-3">
               <div class="col-md-6 mb-3 mb-md-0">
                 <label for="packaging-date" class="form-label">Packaging Date</label>
-                <input type="date" id="packaging-date" class="form-control" max="" required>
+                <input type="date" id="packaging-date" name="packaging-date" class="form-control" max="<?php echo date('Y-m-d'); ?>" required>
               </div>
               <div class="col-md-6">
                 <label for="batch-id" class="form-label">Batch ID</label>
                 <div class="input-group">
                   <span class="input-group-text">BATCH</span>
-                  <input type="text" id="batch-id" class="form-control" placeholder="e.g. 001" required pattern="[0-9]+" aria-describedby="batchIdPrefix">
+                  <input type="text" id="batch-id" name="batch-id" class="form-control" placeholder="e.g. 001" required pattern="[0-9]+" aria-describedby="batchIdPrefix">
                 </div>
               </div>
             </div>
@@ -721,34 +924,16 @@ header.scrolled {
               <label for="transport-id" class="form-label">Transport ID</label>
               <div class="input-group">
                 <span class="input-group-text">TRANS</span>
-                <input type="text" id="transport-id" class="form-control" placeholder="e.g. 100" required pattern="[0-9]+" aria-describedby="transportIdPrefix">
+                <input type="text" id="transport-id" name="transport-id" class="form-control" placeholder="e.g. 100" required pattern="[0-9]+" aria-describedby="transportIdPrefix">
               </div>
             </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success" id="savePackagingBtn">
+                <i class="fas fa-save me-2"></i>Save Packaging
+              </button>
+            </div>
           </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-success" id="savePackagingBtn">
-            <i class="fas fa-save me-2"></i>Save Packaging
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="editConfirmModal" tabindex="-1" aria-labelledby="editConfirmModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-warning text-white">
-          <h5 class="modal-title" id="editConfirmModalLabel"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Edit</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to save these changes to the packaging record?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-warning text-white" id="confirmEditBtn">Confirm Edit</button>
         </div>
       </div>
     </div>
@@ -765,8 +950,11 @@ header.scrolled {
           <p>Are you sure you want to delete this packaging record? This action cannot be undone.</p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Record</button>
+          <form method="POST" action="">
+            <input type="hidden" name="delete_id" id="deleteId">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger" id="confirmDeleteBtn">Delete Record</button>
+          </form>
         </div>
       </div>
     </div>
@@ -775,45 +963,14 @@ header.scrolled {
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    let packagingInfo = [];
-    let currentEditIndex = -1;
-    let deleteIndex = -1;
-    let currentPage = 1;
-    const recordsPerPage = 10;
+    const packagingInfo = <?php echo json_encode($packagingInfo); ?>;
+    let currentPage = <?php echo $currentPage; ?>;
+    const recordsPerPage = <?php echo $recordsPerPage; ?>;
     let debounceTimeout;
 
-    // Sample data
-    packagingInfo = [
-      { type: "Square", weight: "50", date: "2025-04-01", batchId: "BATCH001", transportId: "TRANS100" },
-      { type: "Eco Box", weight: "30", date: "2025-04-15", batchId: "BATCH002", transportId: "TRANS101" },
-      { type: "Jute Bags", weight: "20", date: "2025-05-01", batchId: "BATCH003", transportId: "TRANS102" },
-      { type: "Cardboard Box", weight: "10", date: "2025-06-01", batchId: "BATCH004", transportId: "TRANS103" },
-      { type: "Sack Bags", weight: "15", date: "2025-06-15", batchId: "BATCH005", transportId: "TRANS104" },
-      { type: "Plastic Bag", weight: "120", date: "2025-08-01", batchId: "BATCH006", transportId: "TRANS105" },
-      { type: "Akta hole holo", weight: "200", date: "2025-09-01", batchId: "BATCH007", transportId: "TRANS106" },
-      { type: "Recycled Plastic", weight: "500", date: "2025-12-01", batchId: "BATCH008", transportId: "TRANS107" },
-      { type: "Square", weight: "40", date: "2025-04-02", batchId: "BATCH009", transportId: "TRANS108" },
-      { type: "Eco Box", weight: "20", date: "2025-05-02", batchId: "BATCH010", transportId: "TRANS109" },
-      { type: "Jute Bags", weight: "10", date: "2025-06-02", batchId: "BATCH011", transportId: "TRANS110" },
-      { type: "Cardboard Box", weight: "5", date: "2025-07-02", batchId: "BATCH012", transportId: "TRANS111" },
-      { type: "Sack Bags", weight: "10", date: "2025-08-02", batchId: "BATCH013", transportId: "TRANS112" },
-      { type: "Plastic Bag", weight: "80", date: "2025-09-02", batchId: "BATCH014", transportId: "TRANS113" },
-      { type: "Akta hole holo", weight: "150", date: "2025-11-02", batchId: "BATCH015", transportId: "TRANS114" },
-      { type: "Recycled Plastic", weight: "400", date: "2025-12-02", batchId: "BATCH016", transportId: "TRANS115" }
-    ];
-
-    const tableBody = document.getElementById("tableBody");
-    const pagination = document.getElementById("pagination");
-    const notification = document.querySelector('.notification');
-    const totalRecords = document.getElementById("totalRecords");
-
-    function sanitizeInput(input) {
-      const div = document.createElement('div');
-      div.textContent = input;
-      return div.innerHTML;
-    }
-
     function showNotification(message, isSuccess = true) {
+      const notification = document.querySelector('.notification');
+      if (!notification) return;
       const notificationText = document.getElementById('notificationText');
       notificationText.textContent = message;
       
@@ -832,151 +989,17 @@ header.scrolled {
       }, 3000);
     }
 
-    function renderPagination(filteredItems = packagingInfo) {
-      pagination.innerHTML = "";
-      const pageCount = Math.ceil(filteredItems.length / recordsPerPage);
-
-      const prevItem = document.createElement("li");
-      prevItem.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-      prevItem.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage - 1})" aria-label="Previous page">Previous</a>`;
-      pagination.appendChild(prevItem);
-
-      for (let i = 1; i <= pageCount; i++) {
-        const pageItem = document.createElement("li");
-        pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
-        pageItem.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})" aria-label="Page ${i}">${i}</a>`;
-        pagination.appendChild(pageItem);
-      }
-
-      const nextItem = document.createElement("li");
-      nextItem.className = `page-item ${currentPage === pageCount ? 'disabled' : ''}`;
-      nextItem.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage + 1})" aria-label="Next page">Next</a>`;
-      pagination.appendChild(nextItem);
-    }
-
-    function changePage(page) {
-      const pageCount = Math.ceil(packagingInfo.length / recordsPerPage);
-      if (page < 1 || page > pageCount) return;
-      currentPage = page;
-      updateTable();
-    }
-
-    function updateTable(filteredItems = packagingInfo) {
-      tableBody.innerHTML = "";
-      if (filteredItems.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No records found.</td></tr>';
-        totalRecords.textContent = '0';
-        renderPagination(filteredItems);
-        return;
-      }
-
-      const start = (currentPage - 1) * recordsPerPage;
-      const end = start + recordsPerPage;
-      const paginatedItems = filteredItems.slice(start, end);
-
-      paginatedItems.forEach((item, index) => {
-        const globalIndex = packagingInfo.indexOf(item);
-        const row = document.createElement("tr");
-        row.classList.add('animate__animated', 'animate__fadeIn');
-        row.style.animationDelay = `${index * 0.05}s`;
-        row.innerHTML = `
-          <td>${globalIndex + 1}</td>
-          <td><i class="fas fa-box me-2"></i>${sanitizeInput(item.type)}</td>
-          <td>${sanitizeInput(item.weight)} kg</td>
-          <td>${new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
-          <td><span class="badge bg-light text-dark">${sanitizeInput(item.batchId)}</span></td>
-          <td><span class="badge bg-light text-dark">${sanitizeInput(item.transportId)}</span></td>
-          <td class="text-center action-buttons">
-            <button class="btn btn-warning btn-sm me-2" onclick="editPackaging(${globalIndex})" aria-label="Edit record ${globalIndex + 1}">
-              <i class="fas fa-edit me-1"></i>Edit
-            </button>
-            <button class="btn btn-danger btn-sm" onclick="confirmDelete(${globalIndex})" aria-label="Delete record ${globalIndex + 1}">
-              <i class="fas fa-trash-alt me-1"></i>Delete
-            </button>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-
-      totalRecords.textContent = filteredItems.length;
-      renderPagination(filteredItems);
-      updateCharts();
-    }
-
-    function validateForm(type, weight, date, batchId, transportId) {
-      if (!type || !weight || !date || !batchId || !transportId) {
-        showNotification("Please fill all fields!", false);
-        return false;
-      }
-      if (isNaN(weight) || weight <= 0 || weight > 10000) {
-        showNotification("Weight must be between 0.01 and 10000 kg!", false);
-        return false;
-      }
-      const parsedDate = new Date(date);
-      if (isNaN(parsedDate) || parsedDate > new Date()) {
-        showNotification("Invalid date or date cannot be in the future!", false);
-        return false;
-      }
-      if (packagingInfo.some((item, index) => 
-        (item.batchId === `BATCH${batchId}` || item.transportId === `TRANS${transportId}`) && index !== currentEditIndex
-      )) {
-        showNotification("Batch ID or Transport ID already exists!", false);
-        return false;
-      }
-      return true;
-    }
-
-    function addPackagingInfo() {
-      const type = sanitizeInput(document.getElementById("packaging-type").value);
-      const weight = parseFloat(document.getElementById("weight").value).toFixed(2);
-      const date = document.getElementById("packaging-date").value;
-      const batchId = document.getElementById("batch-id").value;
-      const transportId = document.getElementById("transport-id").value;
-
-      if (!validateForm(type, weight, date, batchId, transportId)) {
-        const form = document.getElementById("packagingForm");
-        form.classList.add('animate__animated', 'animate__shakeX');
-        setTimeout(() => form.classList.remove('animate__animated', 'animate__shakeX'), 1000);
-        return;
-      }
-
-      const newPackaging = {
-        type,
-        weight,
-        date,
-        batchId: `BATCH${batchId}`,
-        transportId: `TRANS${transportId}`
-      };
-
-      if (currentEditIndex !== -1) {
-        const confirmEditModal = new bootstrap.Modal(document.getElementById('editConfirmModal'));
-        document.getElementById('confirmEditBtn').onclick = function() {
-          packagingInfo[currentEditIndex] = newPackaging;
-          showNotification("Packaging record updated successfully!");
-          currentEditIndex = -1;
-          updateTable();
-          confirmEditModal.hide();
-          bootstrap.Modal.getInstance(document.getElementById('addPackagingModal')).hide();
-        };
-        confirmEditModal.show();
-      } else {
-        packagingInfo.push(newPackaging);
-        const pageCount = Math.ceil(packagingInfo.length / recordsPerPage);
-        currentPage = pageCount;
-        showNotification("New packaging record added successfully!");
-        updateTable();
-        bootstrap.Modal.getInstance(document.getElementById('addPackagingModal')).hide();
-      }
-    }
-
-    function editPackaging(index) {
-      const item = packagingInfo[index];
+    function editPackaging(id) {
+      const item = packagingInfo.find(p => p.id == id);
+      if (!item) return;
+      
       document.getElementById("packaging-type").value = item.type;
       document.getElementById("weight").value = item.weight;
       document.getElementById("packaging-date").value = item.date;
       document.getElementById("batch-id").value = item.batchId.replace('BATCH', '');
       document.getElementById("transport-id").value = item.transportId.replace('TRANS', '');
-      currentEditIndex = index;
+      document.getElementById("formAction").value = 'edit';
+      document.getElementById("editId").value = id;
       
       const modal = new bootstrap.Modal(document.getElementById('addPackagingModal'));
       modal.show();
@@ -985,26 +1008,10 @@ header.scrolled {
       document.getElementById('savePackagingBtn').innerHTML = `<i class="fas fa-save me-2"></i>Update Packaging`;
     }
 
-    function confirmDelete(index) {
-      deleteIndex = index;
+    function confirmDelete(id) {
+      document.getElementById('deleteId').value = id;
       const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
       modal.show();
-    }
-
-    function deletePackaging() {
-      if (deleteIndex !== -1) {
-        packagingInfo.splice(deleteIndex, 1);
-        const pageCount = Math.ceil(packagingInfo.length / recordsPerPage);
-        if (currentPage > pageCount && pageCount > 0) {
-          currentPage = pageCount;
-        } else if (packagingInfo.length === 0) {
-          currentPage = 1;
-        }
-        showNotification("Packaging record deleted successfully!");
-        updateTable();
-        deleteIndex = -1;
-        bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
-      }
     }
 
     function filterTable() {
@@ -1014,32 +1021,53 @@ header.scrolled {
           val.toString().toLowerCase().includes(searchTerm)
         )
       );
-      currentPage = 1;
       updateTable(filteredItems);
+    }
+
+    function updateTable(filteredItems = packagingInfo) {
+      const tableBody = document.getElementById("tableBody");
+      const totalRecords = document.getElementById("totalRecords");
+      tableBody.innerHTML = "";
+      
+      if (filteredItems.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No records found.</td></tr>';
+        totalRecords.textContent = '0';
+        return;
+      }
+
+      const start = (currentPage - 1) * recordsPerPage;
+      const end = start + recordsPerPage;
+      const paginatedItems = filteredItems.slice(start, end);
+
+      paginatedItems.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.classList.add('animate__animated', 'animate__fadeIn');
+        row.style.animationDelay = `${index * 0.05}s`;
+        row.innerHTML = `
+          <td>${item.id}</td>
+          <td><i class="fas fa-box me-2"></i>${item.type}</td>
+          <td>${parseFloat(item.weight).toFixed(2)} kg</td>
+          <td>${new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+          <td><span class="badge bg-light text-dark">${item.batchId}</span></td>
+          <td><span class="badge bg-light text-dark">${item.transportId}</span></td>
+          <td class="text-center action-buttons">
+            <button class="btn btn-warning btn-sm me-2" onclick="editPackaging(${item.id})" aria-label="Edit record ${item.id}">
+              <i class="fas fa-edit me-1"></i>Edit
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="confirmDelete(${item.id})" aria-label="Delete record ${item.id}">
+              <i class="fas fa-trash-alt me-1"></i>Delete
+            </button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      totalRecords.textContent = filteredItems.length;
     }
 
     let pieChart, barChart;
 
     function updateCharts() {
-      if (packagingInfo.length === 0) {
-        if (pieChart) pieChart.destroy();
-        if (barChart) barChart.destroy();
-        return;
-      }
-
-      const typeCounts = {};
-      const monthlyTotals = {};
-
-      packagingInfo.forEach(item => {
-        typeCounts[item.type] = (typeCounts[item.type] || 0) + 1;
-        const date = new Date(item.date);
-        if (isNaN(date)) return;
-        const monthName = date.toLocaleString('default', { month: 'short' });
-        const year = date.getFullYear();
-        const monthLabel = `${monthName} ${year}`;
-        monthlyTotals[monthLabel] = (monthlyTotals[monthLabel] || 0) + parseFloat(item.weight);
-      });
-
       const chartColors = {
         'Square': '#FF90BB',
         'Eco Box': '#3D365C',
@@ -1052,12 +1080,12 @@ header.scrolled {
         'No Data': '#ccc'
       };
 
-      const pieLabels = Object.keys(typeCounts).length ? Object.keys(typeCounts) : ['No Data'];
-      const pieData = Object.keys(typeCounts).length ? Object.values(typeCounts) : [1];
+      const pieLabels = <?php echo json_encode($pieLabels); ?>;
+      const pieData = <?php echo json_encode($pieData); ?>;
       const pieBackgroundColors = pieLabels.map(label => chartColors[label] || '#ccc');
 
-      const barLabels = Object.keys(monthlyTotals).sort((a, b) => new Date(a) - new Date(b));
-      const barData = barLabels.map(label => monthlyTotals[label]);
+      const barLabels = <?php echo json_encode($barLabels); ?>;
+      const barData = <?php echo json_encode($barData); ?>;
       const barBackgroundColors = barLabels.map((_, i) => Object.values(chartColors)[i % (Object.keys(chartColors).length - 1)]);
 
       if (pieChart) pieChart.destroy();
@@ -1116,11 +1144,11 @@ header.scrolled {
       barChart = new Chart(document.getElementById("packagingBarChart"), {
         type: 'bar',
         data: {
-          labels: barLabels.length ? barLabels : ['No Data'],
+          labels: barLabels,
           datasets: [{
             label: "Total Weight (kg)",
-            data: barData.length ? barData : [0],
-            backgroundColor: barData.length ? barBackgroundColors : ['#ccc'],
+            data: barData,
+            backgroundColor: barBackgroundColors,
             borderRadius: 8,
             borderWidth: 1,
             borderColor: '#fff'
@@ -1183,23 +1211,21 @@ header.scrolled {
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      // Set max date to today
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('packaging-date').setAttribute('max', today);
       document.getElementById('packaging-date').valueAsDate = new Date();
       
       updateTable();
+      updateCharts();
       
       document.getElementById('addPackagingModal').addEventListener('hidden.bs.modal', function() {
         document.getElementById("packagingForm").reset();
         document.getElementById('addPackagingModalLabel').innerHTML = '<i class="fas fa-box me-2"></i>Add Packaging Info';
         document.getElementById('savePackagingBtn').innerHTML = '<i class="fas fa-save me-2"></i>Save Packaging';
-        currentEditIndex = -1;
+        document.getElementById('formAction').value = 'add';
+        document.getElementById('editId').value = '';
         document.getElementById('packaging-date').valueAsDate = new Date();
       });
-      
-      document.getElementById('savePackagingBtn').addEventListener('click', addPackagingInfo);
-      document.getElementById('confirmDeleteBtn').addEventListener('click', deletePackaging);
       
       document.getElementById('searchInput').addEventListener('input', function() {
         clearTimeout(debounceTimeout);
@@ -1210,7 +1236,13 @@ header.scrolled {
         const header = document.getElementById('mainHeader');
         header.classList.toggle('scrolled', window.scrollY > 10);
       });
+
+      <?php if ($notification): ?>
+      showNotification("<?php echo addslashes($notification); ?>", <?php echo $notification_class == 'alert-success' ? 'true' : 'false'; ?>);
+      <?php endif; ?>
     });
   </script>
 </body>
 </html>
+
+<?php $conn->close(); ?>
