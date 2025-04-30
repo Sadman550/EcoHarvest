@@ -1,121 +1,203 @@
 <?php
 $servername = "localhost";
 $username = "root";
-$password = ""; // Default password empty
-$dbname = "eco_harvest_db";
+$password = "";
+$dbname = "ecoharvest";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
-    die("Database connection failed: " . $conn->connect_error);
+  die("Connection failed: " . $conn->connect_error);
 }
 
-// Add New Batch
+// Add record
 if (isset($_POST['add'])) {
-    $batch_id = $_POST['batch_id'];
-    $crop_name = $_POST['crop_name'];
-    $grade = $_POST['grade'];
-    $weight = $_POST['weight'];
-    $packaging_type = $_POST['packaging_type'];
-    $packaging_date = $_POST['packaging_date'];
+  $batch_id = $_POST['batch_id'];
+  $crop_name = $_POST['crop_name'];
+  $grade = $_POST['grade'];
+  $weight = $_POST['weight'];
+  $packaging_type = $_POST['packaging_type'];
+  $packaging_date = $_POST['packaging_date'];
 
-    $conn->query("INSERT INTO batches (batch_id, crop_name, grade, weight, packaging_type, packaging_date) VALUES ('$batch_id', '$crop_name', '$grade', '$weight', '$packaging_type', '$packaging_date')");
-    header("Location: quality-report.php");
+  $conn->query("INSERT INTO quality_report (batch_id, crop_name, grade, weight, packaging_type, packaging_date)
+                VALUES ('$batch_id', '$crop_name', '$grade', '$weight', '$packaging_type', '$packaging_date')");
+  header("Location: quality-report.php");
 }
 
-// Delete Batch
+// Delete record
 if (isset($_GET['delete'])) {
-    $id = $_GET['delete'];
-    $conn->query("DELETE FROM batches WHERE id=$id");
-    header("Location: quality-report.php");
+  $id = $_GET['delete'];
+  $conn->query("DELETE FROM quality_report WHERE id=$id");
+  header("Location: quality-report.php");
+}
+
+// Search
+$search = "";
+if (isset($_POST['search'])) {
+  $search = $_POST['search'];
+  $result = $conn->query("SELECT * FROM quality_report WHERE 
+    batch_id LIKE '%$search%' OR 
+    crop_name LIKE '%$search%' OR 
+    grade LIKE '%$search%' OR 
+    weight LIKE '%$search%' OR 
+    packaging_type LIKE '%$search%' OR 
+    packaging_date LIKE '%$search%' 
+    ORDER BY id DESC");
+} else {
+  $result = $conn->query("SELECT * FROM quality_report ORDER BY id DESC");
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Eco Harvest | Quality Report</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
   <style>
     body {
-      background-image: url('image/backgraund.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #3c3c3c;
       color: white;
-      font-family: 'Arial', sans-serif;
     }
+
     header {
+      background-color: #2e8b57;
+      padding: 15px 30px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 20px 50px;
-      background-color: rgba(46, 139, 87, 0.9);
-      position: fixed;
-      width: 100%;
-      top: 0;
-      z-index: 100;
+      justify-content: space-between;
     }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+    }
+
     nav ul {
       list-style: none;
       display: flex;
-      gap: 20px;
-      padding: 0;
+      gap: 25px;
       margin: 0;
+      padding: 0;
     }
+
     nav ul li a {
       color: white;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: bold;
+      padding: 5px 10px;
     }
-    .main {
-      padding: 150px 20px 40px;
+
+    nav ul li a:hover {
+      background-color: #256b45;
+      border-radius: 4px;
     }
-    .glass-card {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      border-radius: 12px;
+
+    .container {
+      max-width: 900px;
+      margin: 80px auto 40px;
       padding: 20px;
-      color: white;
+      background-color: #4f4f4f;
+      border-radius: 10px;
+    }
+
+    .container h2 {
+      text-align: center;
       margin-bottom: 30px;
     }
-    table, th, td {
+
+    .form-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="date"] {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      min-width: 150px;
+    }
+
+    .form-group button {
+      background-color: #2e8b57;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .form-group button:hover {
+      background-color: #256b45;
+    }
+
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .search-bar input {
+      padding: 8px;
+      width: 60%;
+      border-radius: 5px;
+      border: none;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table thead {
+      background-color: #2e8b57;
+    }
+
+    table thead th {
+      padding: 12px;
       color: white;
     }
-    .form-control, .btn {
-      border-radius: 6px;
+
+    table tbody td {
+      padding: 10px;
+      text-align: center;
+      background-color: #5f5f5f;
     }
-    .form-control {
-      background-color: rgba(255, 255, 255, 0.15);
+
+    .actions a {
+      padding: 5px 10px;
+      margin: 0 3px;
+      border: none;
+      border-radius: 4px;
+      text-decoration: none;
       color: white;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background-color: #dc3545;
     }
-    .form-control::placeholder {
-      color: #ccc;
-    }
-    @media (max-width: 768px) {
-      header {
-        flex-direction: column;
-        padding: 15px;
-      }
-      nav ul {
-        flex-wrap: wrap;
-        justify-content: center;
-      }
+
+    .actions a:hover {
+      background-color: #c82333;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo fw-bold fs-4">Eco Harvest</div>
+  <div class="logo">Eco Harvest</div>
   <nav>
     <ul>
-      <li><a href="#">Dashboard</a></li>
-      <li><a href="#">Quality Report</a></li>
+      <li><a href="index.php">Dashboard</a></li>
+      <li><a href="quality-report.php">Quality Report</a></li>
+      <li><a href="#">Graded Produced</a></li>
       <li><a href="#">Packaging</a></li>
       <li><a href="#">Transportation</a></li>
       <li><a href="#">Logout</a></li>
@@ -123,69 +205,59 @@ if (isset($_GET['delete'])) {
   </nav>
 </header>
 
-<main class="main container">
+<div class="container">
+  <h2>📋 Add Quality Report</h2>
 
-  <h2 class="text-center mb-4">📋 Quality Report</h2>
+  <form method="POST" class="form-group">
+    <input type="text" name="batch_id" placeholder="e.g. B001" required>
+    <input type="text" name="crop_name" placeholder="e.g. Tomato" required>
+    <input type="text" name="grade" placeholder="e.g. Grade A" required>
+    <input type="text" name="weight" placeholder="e.g. 2 kg" required>
+    <input type="text" name="packaging_type" placeholder="e.g. Eco Box" required>
+    <input type="date" name="packaging_date" required>
+    <button type="submit" name="add">Add</button>
+  </form>
 
-  <!-- Add Crop Form -->
-  <div class="glass-card">
-    <h5 class="mb-3">➕ Add New Crop Batch</h5>
-    <form method="POST" class="row g-2">
-      <div class="col-md-2"><input class="form-control" name="batch_id" placeholder="Batch ID"></div>
-      <div class="col-md-2"><input class="form-control" name="crop_name" placeholder="Crop Name"></div>
-      <div class="col-md-2"><input class="form-control" name="grade" placeholder="Grade"></div>
-      <div class="col-md-2"><input class="form-control" name="weight" placeholder="Weight (kg)" type="number"></div>
-      <div class="col-md-2"><input class="form-control" name="packaging_type" placeholder="Packaging Type"></div>
-      <div class="col-md-2"><input class="form-control" name="packaging_date" placeholder="Packaging Date" type="date"></div>
-      <div class="col-12">
-        <button type="submit" name="add" class="btn btn-success mt-3">Add</button>
-      </div>
-    </form>
-  </div>
+  <!-- Search Bar -->
+  <form method="POST" class="search-bar">
+    <input type="text" name="search" placeholder="Search by any field..." value="<?php echo htmlspecialchars($search); ?>">
+    <button type="submit">Search</button>
+  </form>
 
-  <!-- Table -->
-  <div class="glass-card">
-    <h5>📦 Crop Batch List</h5>
-    <div class="table-responsive">
-      <table class="table table-bordered text-white">
-        <thead>
-          <tr>
-            <th>Batch ID</th>
-            <th>Crop Name</th>
-            <th>Grade</th>
-            <th>Weight (kg)</th>
-            <th>Packaging Type</th>
-            <th>Packaging Date</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          $result = $conn->query("SELECT * FROM batches ORDER BY id DESC");
-          while ($row = $result->fetch_assoc()):
-          ?>
-          <tr>
-            <td><?php echo $row['batch_id']; ?></td>
-            <td><?php echo $row['crop_name']; ?></td>
-            <td><?php echo $row['grade']; ?></td>
-            <td><?php echo $row['weight']; ?></td>
-            <td><?php echo $row['packaging_type']; ?></td>
-            <td><?php echo $row['packaging_date']; ?></td>
-            <td>
-              <a href="quality-report.php?delete=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
-            </td>
-          </tr>
-          <?php endwhile; ?>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-</main>
-
-<footer class="text-center mt-4 py-3" style="background-color: rgba(255,255,255,0.2); color: white;">
-  &copy; 2025 Eco Harvest
-</footer>
+  <table>
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Batch ID</th>
+        <th>Crop</th>
+        <th>Grade</th>
+        <th>Weight</th>
+        <th>Packaging</th>
+        <th>Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php
+      $count = 1;
+      while ($row = $result->fetch_assoc()):
+      ?>
+      <tr>
+        <td><?php echo $count++; ?></td>
+        <td><?php echo $row['batch_id']; ?></td>
+        <td><?php echo $row['crop_name']; ?></td>
+        <td><?php echo $row['grade']; ?></td>
+        <td><?php echo $row['weight']; ?></td>
+        <td><?php echo $row['packaging_type']; ?></td>
+        <td><?php echo $row['packaging_date']; ?></td>
+        <td class="actions">
+          <a href="?delete=<?php echo $row['id']; ?>" onclick="return confirm('Are you sure?')">Delete</a>
+        </td>
+      </tr>
+      <?php endwhile; ?>
+    </tbody>
+  </table>
+</div>
 
 </body>
 </html>
