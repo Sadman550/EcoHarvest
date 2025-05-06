@@ -1,0 +1,13 @@
+CREATE TABLE quality_analysis (
+  id int(11) NOT NULL,
+  batch_id varchar(50) NOT NULL,
+  crop_name varchar(100) NOT NULL,
+  grade char(1) NOT NULL,
+  weight decimal(10,2) NOT NULL,
+  qualified_products int(11) NOT NULL,
+  disqualified_products int(11) NOT NULL,
+  defects decimal(5,2) NOT NULL,
+  quality_score int(11) NOT NULL,
+  inspector varchar(100) NOT NULL,
+  created_at timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
