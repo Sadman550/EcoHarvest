@@ -191,19 +191,31 @@ if (isset($_POST['search'])) {
 </head>
 <body>
 
-<header>
-  <div class="logo">Eco Harvest</div>
-  <nav>
-    <ul>
-      <li><a href="index.php">Dashboard</a></li>
-      <li><a href="quality-report.php">Quality Report</a></li>
-      <li><a href="#">Graded Produced</a></li>
-      <li><a href="#">Packaging</a></li>
-      <li><a href="#">Transportation</a></li>
-      <li><a href="#">Logout</a></li>
-    </ul>
-  </nav>
-</header>
+<header class="navbar navbar-expand-lg navbar-dark bg-success fixed-top">
+        <div class="d-flex justify-content-between align-items-center w-100">
+            <div class="navbar-brand d-flex align-items-center text-white">
+                <img src="image/Logo.PNG" alt="Eco Harvest Logo" style="height: 60px; margin-right: 10px;" onerror="this.src='https://via.placeholder.com/60';">
+                <span>Eco Harvest</span>
+            </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <nav>
+                <ul class="navbar-nav flex-row">
+                        <li class="nav-item"><a href="dashboard.php" class="nav-link"><i class="fas fa-home me-1"></i> Dashboard</a></li>
+                        <li class="nav-item"><a href="qualityreport.php" class="nav-link"><i class="fas fa-clipboard-check me-1"></i> Quality Report</a></li>
+                        <li class="nav-item"><a href="grading.php" class="nav-link"><i class="fas fa-seedling me-1"></i> Graded Produced</a></li>
+                        <li class="nav-item"><a href="qualityanalysis.php" class="nav-link active"><i class="fas fa-chart-line me-1"></i> Quality Analysis</a></li>
+                        <li class="nav-item"><a href="packaging.php" class="nav-link"><i class="fas fa-box-open me-1"></i> Packaging</a></li>
+                        <li class="nav-item"><a href="transport.php" class="nav-link"><i class="fas fa-shipping-fast me-1"></i> Transportation</a></li>
+                        <li class="nav-item"><a href="supplychain.php" class="nav-link"><i class="fas fa-truck me-1"></i> Supply Chain</a></li>
+                        <li class="nav-item"><a href="index.php" class="nav-link"><i class="fas fa-sign-out-alt me-1"></i> Logout</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
 
 <div class="container">
   <h2>📋 Add Quality Report</h2>

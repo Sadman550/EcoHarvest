@@ -1,0 +1,6 @@
+[04-May-2025 17:26:31 Europe/Berlin] Received request: Method=GET, Input=null
+[04-May-2025 17:26:31 Europe/Berlin] PHP Warning:  Undefined variable $conn in C:\Xampp\htdocs\ecoharvest\transport.php on line 337
+[04-May-2025 17:26:31 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function close() on null in C:\Xampp\htdocs\ecoharvest\transport.php:337
+Stack trace:
+#0 {main}
+  thrown in C:\Xampp\htdocs\ecoharvest\transport.php on line 337
